@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Current Elections</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}"> <!-- Optional CSS file -->
+</head>
+<body>
+    <h1>Current Elections</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Election Name</th>
+                <th>Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for election in elections %}
+            <tr>
+                <td>{{ election.name }}</td>
+                <td>{{ election.date }}</td>
+                <td>{{ election.status }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <p><a href="{{ url_for('admin_dashboard') }}">Back to Admin Dashboard</a></p> <!-- Link to return to admin dashboard -->
+</body>
+</html>

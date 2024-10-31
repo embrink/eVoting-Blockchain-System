@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <script>
+        function toggleInputs(role) {
+            const voterFields = document.getElementById('voter-fields');
+            const adminFields = document.getElementById('admin-fields');
+            const auditorFields = document.getElementById('auditor-fields');
+
+            // Toggle visibility based on selected role
+            if (role === 'voter') {
+                voterFields.style.display = 'block';
+                adminFields.style.display = 'none';
+                auditorFields.style.display = 'none';
+            } else if (role === 'admin') {
+                adminFields.style.display = 'block';
+                voterFields.style.display = 'none';
+                auditorFields.style.display = 'none';
+            } else if (role === 'auditor') {
+                auditorFields.style.display = 'block';
+                voterFields.style.display = 'none';
+                adminFields.style.display = 'none';
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Login</h1>
+    <form method="POST" action="/login">
+        <label for="role">Select Role:</label>
+        <select id="role" name="role" onchange="toggleInputs(this.value)" required>
+            <option value="">--Select Role--</option>
+            <option value="voter">Voter</option>
+            <option value="admin">Admin</option>
+            <option value="auditor">Auditor</option>
+        </select>
+
+        <div id="voter-fields" style="display:none;">
+            <h2>Voter Login</h2>
+            <label for="ssn">SSN:</label>
+            <input type="text" id="ssn" name="ssn" required><br>
+
+            <label for="zipcode">Zipcode:</label>
+            <input type="text" id="zipcode" name="zipcode" required><br>
+
+            <label for="driver_id">Driver ID:</label>
+            <input type="text" id="driver_id" name="driver_id" required><br>
+        </div>
+
+        <div id="admin-fields" style="display:none;">
+            <h2>Admin Login</h2>
+            <label for="user_id">Admin ID:</label>
+            <input type="text" id="user_id" name="user_id" required><br>
+        </div>
+
+        <div id="auditor-fields" style="display:none;">
+            <h2>Auditor Login</h2>
+            <label for="user_id">Auditor ID:</label>
+            <input type="text" id="user_id" name="user_id" required><br>
+        </div>
+
+        <input type="submit" value="Login">
+    </form>
+</body>
+</html>

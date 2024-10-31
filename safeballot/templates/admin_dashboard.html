@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+</head>
+<body>
+    <h1>Welcome, Admin {{ admin_name }}</h1>
+    <h2>Admin Actions</h2>
+    <form method="POST" action="/create_election">
+        <h3>Create Election</h3>
+        <label for="name">Election Name:</label>
+        <input type="text" id="name" name="name" required><br>
+
+        <label for="date">Election Date:</label>
+        <input type="date" id="date" name="date" required><br>
+
+        <input type="submit" value="Create Election">
+    </form>
+
+    <h3>Current Elections</h3>
+    <a href="/view_elections">View Current Elections</a><br>
+
+    <form action="/logout" method="POST">
+        <input type="submit" value="Logout">
+    </form>
+</body>
+</html>

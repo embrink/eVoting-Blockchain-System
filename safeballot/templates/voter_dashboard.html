@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voter Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}"> <!-- Optional CSS file -->
+</head>
+<body>
+    <h1>Voter Dashboard</h1>
+    <p>Welcome, {{ voter_name }}! Here are the elections you can vote in:</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Election Name</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for election in elections %}
+            <tr>
+                <td>{{ election.name }}</td>
+                <td>{{ election.date }}</td>
+                <td>{{ election.status }}</td>
+                <td>
+                    {% if election.status == 'Open' %}
+                    <a href="{{ url_for('cast_vote', election_id=election.id) }}">Vote Now</a>
+                    {% else %}
+                    <span>Closed</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <p><a href="/logout">Logout</a></p> <!-- Link to logout -->
+</body>
+</html>

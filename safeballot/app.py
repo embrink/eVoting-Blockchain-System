@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from database import add_voter, get_voter, create_election, get_current_elections  # Import the database functions
 
+
+
 app = Flask(__name__)
 app.secret_key = 'cis454'  # Set a secret key for session management
 
@@ -17,6 +19,7 @@ def index():
 def login():
     if request.method == 'POST':
         role = request.form['role']  # Get user role from form
+        print(f"Role selected: {role}")
 
         #LOGIN OPTIONS
         if role == 'admin':
@@ -30,7 +33,7 @@ def login():
                 return redirect(url_for('login'))  # Redirect back to login page
 
         elif role == 'auditor':
-            user_id = request.form['user_id']  # Get user ID from form
+            user_id = request.form['auditor_id']  # Get user ID from form
             session['auditor_name'] = user_id  # Store auditor name in session
             return redirect(url_for('auditor_dashboard'))  # Redirect to auditor dashboard
 
@@ -56,8 +59,12 @@ def login():
 # Admin dashboard route
 @app.route('/admin_dashboard')
 def admin_dashboard():
-    return render_template('admin_dashboard.html', admin_name=session.get('admin_name'))  # Render the admin dashboard template
-
+    if 'admin_name' in session:
+        return render_template('admin_dashboard.html', admin_name=session['admin_name'])
+    else:
+        flash("You need to log in as admin first.", "error")  # Flash an error if not logged in
+        return redirect(url_for('login'))
+    
 # Create election route
 @app.route('/create_election', methods=['GET', 'POST'])
 def create_election_view():
@@ -109,3 +116,6 @@ def logout():
 # Run app in debug mode
 if __name__ == '__main__':
     app.run(debug=True)
+
+for rule in app.url_map.iter_rules():
+    print(rule)

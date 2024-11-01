@@ -10,19 +10,37 @@
             const adminFields = document.getElementById('admin-fields');
             const auditorFields = document.getElementById('auditor-fields');
 
-            // Toggle visibility based on selected role
+            // Hide all fields initially
+            voterFields.style.display = 'none';
+            adminFields.style.display = 'none';
+            auditorFields.style.display = 'none';
+
+            // Reset all input values and required attributes
+            document.getElementById('ssn').value = '';
+            document.getElementById('driver_id').value = '';
+            document.getElementById('zipcode').value = '';
+            document.getElementById('auditor_id').value = '';
+            document.getElementById('admin_id').value = '';
+
+            // Reset required attributes
+            document.getElementById('ssn').required = false;
+            document.getElementById('driver_id').required = false;
+            document.getElementById('zipcode').required = false;
+            document.getElementById('auditor_id').required = false;
+            document.getElementById('admin_id').required = false;
+
+            // Show fields based on selected role
             if (role === 'voter') {
                 voterFields.style.display = 'block';
-                adminFields.style.display = 'none';
-                auditorFields.style.display = 'none';
+                document.getElementById('ssn').required = true;
+                document.getElementById('driver_id').required = true;
+                document.getElementById('zipcode').required = true;
             } else if (role === 'admin') {
                 adminFields.style.display = 'block';
-                voterFields.style.display = 'none';
-                auditorFields.style.display = 'none';
+                document.getElementById('admin_id').required = true;
             } else if (role === 'auditor') {
                 auditorFields.style.display = 'block';
-                voterFields.style.display = 'none';
-                adminFields.style.display = 'none';
+                document.getElementById('auditor_id').required = true;
             }
         }
     </script>
@@ -41,25 +59,23 @@
         <div id="voter-fields" style="display:none;">
             <h2>Voter Login</h2>
             <label for="ssn">SSN:</label>
-            <input type="text" id="ssn" name="ssn" required><br>
-
-            <label for="zipcode">Zipcode:</label>
-            <input type="text" id="zipcode" name="zipcode" required><br>
-
+            <input type="text" id="ssn" name="ssn"><br>
             <label for="driver_id">Driver ID:</label>
-            <input type="text" id="driver_id" name="driver_id" required><br>
+            <input type="text" id="driver_id" name="driver_id"><br>
+            <label for="zipcode">Zipcode:</label>
+            <input type="text" id="zipcode" name="zipcode"><br>
         </div>
 
         <div id="admin-fields" style="display:none;">
             <h2>Admin Login</h2>
-            <label for="user_id">Admin ID:</label>
-            <input type="text" id="user_id" name="user_id" required><br>
+            <label for="admin_id">Admin ID:</label>
+            <input type="text" id="admin_id" name="user_id"><br> <!-- Using user_id as per your logic -->
         </div>
 
         <div id="auditor-fields" style="display:none;">
             <h2>Auditor Login</h2>
-            <label for="user_id">Auditor ID:</label>
-            <input type="text" id="user_id" name="user_id" required><br>
+            <label for="auditor_id">Auditor ID:</label>
+            <input type="text" id="auditor_id" name="user_id"><br> <!-- Using user_id for auditor as well -->
         </div>
 
         <input type="submit" value="Login">

@@ -6,6 +6,7 @@ def create_connection():
     return conn
 
 def add_voter(ssn, zipcode, driver_id):
+    print(f"Attempting to add voter: SSN={ssn}, Zipcode={zipcode}, Driver ID={driver_id}")
     voter_id = str(uuid.uuid4())  # Generate a unique voter ID
     conn = create_connection()
     cursor = conn.cursor()
@@ -16,6 +17,7 @@ def add_voter(ssn, zipcode, driver_id):
             VALUES (?, ?, ?, ?)
         ''', (voter_id, ssn, zipcode, driver_id))
         conn.commit()
+        print(f"Voter added successfully: {voter_id}")  # Debugging
         return voter_id  # Return the generated voter ID
     except sqlite3.IntegrityError:
         # This error occurs if the SSN is already in the database
@@ -26,8 +28,9 @@ def add_voter(ssn, zipcode, driver_id):
 def get_voter(ssn):
     conn = create_connection()
     cursor = conn.cursor()
-    cursor.execute('SELECT voter_id, zipcode, driver_id FROM voters WHERE ssn = ?', (ssn,))
+    cursor.execute('SELECT voter_id, ssn, zipcode, driver_id FROM voters WHERE ssn = ?', (ssn,))
     voter = cursor.fetchone()
+    print(f"Query result for SSN {ssn}: {voter}") #debugging statement 
     conn.close()
     return voter
 
@@ -105,4 +108,4 @@ def get_all_voters():
     return voters
 
 add_voter('123-45-6789', '12345', 'D1234567')  # Example test data
-add_voter('987-65-4321', '54321', 'D7654321')
+add_voter('987-65-4321', '54321', 'D7654321') #ssn, zipcode, driver id 

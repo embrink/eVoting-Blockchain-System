@@ -1,10 +1,10 @@
 <!-- signup.html -->
 <form method="POST" action="/signup">
     <label for="ssn">SSN:</label>
-    <input type="text" id="ssn" name="ssn" required>
+    <input type="text" id="ssn" name="ssn" minlength="9" maxlength="11" pattern="\d{3}-\d{2}-\d{4}" title="Format: XXX-XX-XXXX" required>
     
     <label for="zipcode">Zip Code:</label>
-    <input type="text" id="zipcode" name="zipcode" required>
+    <input type="text" id="zipcode" name="zipcode" pattern="\d{5}" title="Five-digit ZIP code" required>
     
     <label for="driver_id">Driver ID:</label>
     <input type="text" id="driver_id" name="driver_id" required>

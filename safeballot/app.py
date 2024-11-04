@@ -42,9 +42,19 @@ def login():
             zipcode = request.form['zipcode']  # Get Zipcode from form
             driver_id = request.form['driver_id']  # Get Driver ID from form
             
+            # Debugging statements
+            print(f"SSN: {ssn}, Zipcode: {zipcode}, Driver ID: {driver_id}")
+
             # Validate voter credentials
             voter_info = get_voter(ssn)  # Get voter info based on SSN
-            if voter_info and voter_info[1] == zipcode and voter_info[2] == driver_id:
+            print(f"Get_voter info", voter_info)
+            print(f"Get_voter info[1],ssn ", voter_info[1])
+            print(f"Get_voter info[2],zipcode ", voter_info[2])
+            print(f"Get_voter info[3],driver_id ", voter_info[3])
+            print(f"voter info[2]", zipcode)
+            print(f"[voter info[3]", driver_id)
+            print((f"[voter info[1]", ssn))
+            if (voter_info[1] == ssn and voter_info[2] == zipcode and voter_info[3] == driver_id):
                 session['voter_id'] = voter_info[0]  # Store voter ID in session
                 return redirect(url_for('voter_dashboard'))  # Redirect to voter dashboard
             else:

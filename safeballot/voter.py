@@ -1,4 +1,5 @@
 import sqlite3
+from web3 import Web3
 
 class Voter:
     def __init__(self, ssn, driver_id, zipcode, voter_account, private_key, contract):
@@ -29,10 +30,10 @@ class Voter:
     def cast_vote(self, candidate_id):
         transaction = self.contract.functions.castVote(candidate_id).buildTransaction({
             'from': self.voter_account,
-            'nonce': web3.eth.get_transaction_count(self.voter_account),
+            'nonce': Web3.eth.get_transaction_count(self.voter_account),
             'gas': 2000000,
             'gasPrice': web3.toWei('50', 'gwei')
         })
-        signed_txn = web3.eth.account.sign_transaction(transaction, self.private_key)
-        tx_hash = web3.eth.send_raw_transaction(signed_txn.rawTransaction)
+        signed_txn = Web3.eth.account.sign_transaction(transaction, self.private_key)
+        tx_hash = Web3.eth.send_raw_transaction(signed_txn.rawTransaction)
         print(f"Vote transaction hash: {tx_hash.hex()}")

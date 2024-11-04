@@ -63,6 +63,7 @@ def create_election(name, date):
     conn.commit()
     conn.close()
 
+
 def get_current_elections():
     conn = create_connection()
     cursor = conn.cursor()
@@ -92,3 +93,16 @@ def create_elections_table():
     conn.close()
 
 create_elections_table() 
+
+
+def get_all_voters():
+    conn = create_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute('SELECT * FROM voters')
+    voters = cursor.fetchall()  # Fetch all records from the voters table
+    conn.close()
+    return voters
+
+add_voter('123-45-6789', '12345', 'D1234567')  # Example test data
+add_voter('987-65-4321', '54321', 'D7654321')

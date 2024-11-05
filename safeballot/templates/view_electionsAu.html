@@ -31,6 +31,9 @@
         </tbody>
     </table>
 
-    <p><a href="{{ url_for('admin_dashboard') }}">Back to Admin Dashboard</a></p> <!-- Link to return to admin dashboard -->
+    <button onclick="window.location.href='/approve_election/{{ election.id }}'">Approve Election</button>
+    <button onclick="window.location.href='/pull_statistics/{{ election.id }}'">Pull Statistics</button>
+    <p><a href="{{ url_for('auditor_dashboard') }}">Back to Auditor Dashboard</a></p> <!-- Link to return to admin dashboard -->
+
 </body>
 </html>

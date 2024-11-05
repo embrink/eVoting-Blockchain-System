@@ -33,7 +33,7 @@ def login():
                 return redirect(url_for('login'))  # Redirect back to login page
 
         elif role == 'auditor':
-            user_id = request.form['auditor_id']  # Get user ID from form
+            user_id = request.form['u_id']  # Get user ID from form
             session['auditor_name'] = user_id  # Store auditor name in session
             return redirect(url_for('auditor_dashboard'))  # Redirect to auditor dashboard
 
@@ -47,13 +47,8 @@ def login():
 
             # Validate voter credentials
             voter_info = get_voter(ssn)  # Get voter info based on SSN
-            print(f"Get_voter info", voter_info)
-            print(f"Get_voter info[1],ssn ", voter_info[1])
-            print(f"Get_voter info[2],zipcode ", voter_info[2])
-            print(f"Get_voter info[3],driver_id ", voter_info[3])
-            print(f"voter info[2]", zipcode)
-            print(f"[voter info[3]", driver_id)
-            print((f"[voter info[1]", ssn))
+            print(f"Get_voter info", voter_info) #debugging statement 
+            
             if (voter_info[1] == ssn and voter_info[2] == zipcode and voter_info[3] == driver_id):
                 session['voter_id'] = voter_info[0]  # Store voter ID in session
                 return redirect(url_for('voter_dashboard'))  # Redirect to voter dashboard
@@ -91,6 +86,11 @@ def create_election_view():
 def view_elections():
     elections = get_current_elections()  # Fetch current elections from the database
     return render_template('view_elections.html', elections=elections)  # Render the view elections page
+
+@app.route('/view_electionsAu')
+def view_elections_auditor():
+    elections = get_current_elections()  # Fetch current elections from the database
+    return render_template('view_electionsAu.html', elections=elections)  # Render the view elections page
 
 # Auditor dashboard route
 @app.route('/auditor_dashboard')

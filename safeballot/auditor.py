@@ -9,6 +9,7 @@ class Auditor:
     def login(self):
         # Auditor login check from SQLite database
         conn = sqlite3.connect('database/voting_system.db')
+        print("Conn:", conn) 
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM auditors WHERE auditor_id=?", (self.auditor_id,))
         result = cursor.fetchone()

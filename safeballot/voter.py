@@ -32,7 +32,7 @@ class Voter:
             'from': self.voter_account,
             'nonce': Web3.eth.get_transaction_count(self.voter_account),
             'gas': 2000000,
-            'gasPrice': web3.toWei('50', 'gwei')
+            'gasPrice': Web3.toWei('50', 'gwei')
         })
         signed_txn = Web3.eth.account.sign_transaction(transaction, self.private_key)
         tx_hash = Web3.eth.send_raw_transaction(signed_txn.rawTransaction)

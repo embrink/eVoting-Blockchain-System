@@ -22,8 +22,8 @@
     <h3>Current Elections</h3>
     <a href="/view_elections">View Current Elections</a><br>
 
-    <form action="/logout" method="POST">
-        <input type="submit" value="Logout">
+    <form action="{{ url_for('logout') }}" method="post">
+        <button type="submit">Logout</button>
     </form>
 </body>
 </html>

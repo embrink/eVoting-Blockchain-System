@@ -118,15 +118,15 @@ def signup():
     return render_template('signup.html')  # Render the signup page
 
 # Logout route
-@app.route('/logout')
+@app.route('/logout', methods=['GET', 'POST'])
 def logout():
     session.clear()  # Clear session data
-    return redirect(url_for('index'))  # Redirect to the home page
+    return render_template('logout.html')  # Render logout.html after logging out
 
 # Run app in debug mode
 if __name__ == '__main__':
     app.run(debug=True)
 
 for rule in app.url_map.iter_rules():
-    print(rule)
+    print(rule) 
 

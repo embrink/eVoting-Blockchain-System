@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from database import add_voter, get_voter, create_election, get_current_elections, create_database, create_elections_table, get_all_voters  # Import the database functions
-import time 
+
 
 
 app = Flask(__name__)

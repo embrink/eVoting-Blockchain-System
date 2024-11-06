@@ -36,64 +36,58 @@ def get_voter(ssn):
 
 # Call this function once to create the database and table
 def create_database():
-    conn = create_connection()
-    cursor = conn.cursor()
-
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS voters (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        voter_id TEXT NOT NULL UNIQUE,  -- Added voter_id column
-        ssn TEXT NOT NULL UNIQUE,
-        zipcode TEXT NOT NULL,
-        driver_id TEXT NOT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-    ''')
-
-    conn.commit()
-    conn.close()
+    """Create the database and the voters table if it doesn't exist."""
+    with create_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS voters (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            voter_id TEXT NOT NULL UNIQUE,  -- Added voter_id column
+            ssn TEXT NOT NULL UNIQUE,
+            zipcode TEXT NOT NULL,
+            driver_id TEXT NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+        ''')
+        conn.commit()
 
 create_database()  # Create the database and table if it doesn't exist
 def create_election(name, date):
-    conn = create_connection()
-    cursor = conn.cursor()
-
-    cursor.execute('''
-        INSERT INTO elections (name, date, status)
-        VALUES (?, ?, ?)
-    ''', (name, date, 'Open'))  # Setting the initial status to 'Open'
-    
-    conn.commit()
-    conn.close()
+    """Add a new election to the elections table."""
+    with create_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO elections (name, date, status)
+            VALUES (?, ?, ?)
+        ''', (name, date, 'Open'))  # Setting the initial status to 'Open'
+        conn.commit()
 
 
 def get_current_elections():
-    conn = create_connection()
-    cursor = conn.cursor()
-    
-    cursor.execute('SELECT name, date, status FROM elections')
-    elections = cursor.fetchall()
-    
-    conn.close()
+    """Get all the current elections."""
+    with create_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute('SELECT name, date, status FROM elections')
+        elections = cursor.fetchall()
     return [{'name': row[0], 'date': row[1], 'status': row[2]} for row in elections]
+
 
 # Call this function once to create the elections table
 def create_elections_table():
-    conn = create_connection()
-    cursor = conn.cursor()
+    """Create the elections table if it doesn't exist."""
+    with create_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS elections (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            date TEXT NOT NULL,
+            status TEXT NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+        ''')
+        conn.commit()
 
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS elections (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        date TEXT NOT NULL,
-        status TEXT NOT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-    ''')
-
-    conn.commit()
-    conn.close()
 
 create_elections_table() 
 

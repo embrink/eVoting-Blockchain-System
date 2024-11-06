@@ -7,9 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}"> <!-- Optional CSS file -->
 </head>
 <body>
-    
 
-    
     <h1>Current Elections</h1>
 
     <table>
@@ -18,6 +16,7 @@
                 <th>Election Name</th>
                 <th>Date</th>
                 <th>Status</th>
+                <th>Actions</th> <!-- Added a column for action buttons -->
             </tr>
         </thead>
         <tbody>
@@ -26,14 +25,17 @@
                 <td>{{ election.name }}</td>
                 <td>{{ election.date }}</td>
                 <td>{{ election.status }}</td>
+                <td>
+                    <!-- Place the buttons inside the loop to reference the specific election -->
+                    <button onclick="window.location.href='/approve_election/{{ election.id }}'">Approve Election</button>
+                    <button onclick="window.location.href='/pull_statistics/{{ election.id }}'">Pull Statistics</button>
+                </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 
-    <button onclick="window.location.href='/approve_election/{{ election.id }}'">Approve Election</button>
-    <button onclick="window.location.href='/pull_statistics/{{ election.id }}'">Pull Statistics</button>
-    <p><a href="{{ url_for('auditor_dashboard') }}">Back to Auditor Dashboard</a></p> <!-- Link to return to admin dashboard -->
+    <p><a href="{{ url_for('auditor_dashboard') }}">Back to Auditor Dashboard</a></p> <!-- Link to return to auditor dashboard -->
 
 </body>
 </html>

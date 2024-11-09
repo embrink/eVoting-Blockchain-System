@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Election</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}"> <!-- Optional CSS file -->
+</head>
+<body>
+    <h1>Create Election</h1>
+    <form method="POST" action="/create_election">
+        <label for="name">Election Name:</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="date">Election Date:</label>
+        <input type="date" id="date" name="date" required>
+
+        <input type="submit" value="Create Election">
+    </form>
+
+    <p><a href="{{ url_for('admin_dashboard') }}">Back to Admin Dashboard</a></p> <!-- Link to return to admin dashboard -->
+</body>
+</html>

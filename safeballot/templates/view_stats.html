@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auditor Dashboard</title>
+</head>
+<body>
+    <h1>Auditor Dashboard</h1>
+    <h2>Election Statistics</h2>
+    
+    <h3>Total Votes Cast: {{ total_votes }}</h3>
+    
+    <h3>Vote Counts by Candidate:</h3>
+    <ul>
+        {% for candidate in candidates %}
+            <li>Candidate: {{ candidate.name }} | Votes: {{ candidate.vote_count }}</li>
+        {% endfor %}
+    </ul>
+
+    <h3>Voters List:</h3>
+    <ul>
+        {% for voter in voters %}
+            <li>{{ voter }}</li>
+        {% endfor %}
+    </ul>
+    
+    <form action="{{ url_for('logout') }}" method="post">
+        <button type="submit">Logout</button>
+    </form>
+</body>
+</html>

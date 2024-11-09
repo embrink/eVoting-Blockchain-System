@@ -6,8 +6,10 @@
     <title>Admin Dashboard</title>
 </head>
 <body>
-    <h1>Welcome, Admin {{ admin_name }}</h1>
+    <h1>Welcome, Admin</h1>
     <h2>Admin Actions</h2>
+    
+    <!-- Election creation form -->
     <form method="POST" action="/create_election">
         <h3>Create Election</h3>
         <label for="name">Election Name:</label>
@@ -16,14 +18,16 @@
         <label for="date">Election Date:</label>
         <input type="date" id="date" name="date" required><br>
 
+        <label for="candidates">Candidates (separate names with commas):</label>
+        <input type="text" id="candidates" name="candidates" required><br>
+
         <input type="submit" value="Create Election">
     </form>
 
-    <h3>Current Elections</h3>
-    <a href="/view_elections">View Current Elections</a><br>
+    <!-- Link to View Elections -->
+    <h3>Options</h3>
+    <p><a href="{{ url_for('view_elections') }}">View Current Elections</a></p> <!-- Link to view elections -->
+    <p><a href="{{ url_for('logout') }}">Logout</a></p> <!-- Link to logout -->
 
-    <form action="{{ url_for('logout') }}" method="post">
-        <button type="submit">Logout</button>
-    </form>
 </body>
 </html>

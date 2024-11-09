@@ -26,6 +26,10 @@
                 <td>{{ election.name }}</td>
                 <td>{{ election.date }}</td>
                 <td>{{ election.status }}</td>
+                <td>
+                    <!-- Place the buttons inside the loop to reference the specific election -->
+                    <button onclick="window.location.href='/vot/{{ election.id }}'">Vote</button>
+                </td>
             </tr>
             {% endfor %}
         </tbody>

@@ -69,18 +69,6 @@ def admin_dashboard():
     else:
         flash("You need to log in as admin first.", "error")  # Flash an error if not logged in
         return redirect(url_for('login'))
-    
-# Create election route
-@app.route('/create_election', methods=['GET', 'POST'])
-def create_election_view():
-    if request.method == 'POST':
-        name = request.form['name']
-        date = request.form['date']
-        create_election(name, date)  # Save the election to the database
-        return redirect(url_for('admin_dashboard'))  # Redirect back to the admin dashboard after creating
-
-    return render_template('create_election.html')  # Render the create election page
-
 # View current elections route
 @app.route('/view_elections')
 def view_elections():
@@ -102,7 +90,7 @@ def auditor_dashboard():
 def voter_dashboard():
     return render_template('voter_dashboard.html')  # Render the voter dashboard template
 
-@app.route('/view_electionsAu')
+@app.route('/view_elections_Voter')
 def view_elections_voter():
     elections = get_current_elections()  # Fetch current elections from the database
     return render_template('view_elections_voter.html', elections=elections)  # Render the view elections page
@@ -121,6 +109,57 @@ def signup():
             return "Voter with this SSN already exists", 400  # Bad request error
 
     return render_template('signup.html')  # Render the signup page
+
+#cast vote
+@app.route('/cast_vote_election/<int:election_id>', methods=['GET', 'POST'])
+def cast_vote_election(election_id):
+    conn = sqlite3.connect('database/voting_system.db')
+    cursor = conn.cursor()
+
+    # Fetch election details and candidates
+    cursor.execute("SELECT title, candidates FROM elections WHERE election_id = ?", (election_id,))
+    election = cursor.fetchone()
+
+    if election:
+        # Split the candidates string into a list
+        candidates = election[1].split(', ')  # or use json.loads(election[1]) if using JSON serialization
+        return render_template('cast_vote_election.html', election_title=election[0], candidates=candidates, election_id=election_id)
+    else:
+        flash('Election not found', 'error')
+        return redirect(url_for('view_elections'))
+
+#send vote to contract
+@app.route('/submit_vote/<int:election_id>', methods=['POST'])
+def submit_vote(election_id):
+    selected_candidate = request.form['candidate']
+    
+    # Call the smart contract to cast the vote on the blockchain
+    try:
+        # Assuming you have a web3 instance set up
+        web3 = Web3(Web3.HTTPProvider('http://localhost:8545'))  # Replace with your provider
+        contract = web3.eth.contract(address=your_contract_address, abi=your_contract_abi)
+        
+        # Get the candidate ID (this would depend on how the candidates are stored in your contract)
+        candidate_id = get_candidate_id(selected_candidate)  # Implement this mapping
+        
+        # Send the vote to the blockchain
+        transaction = contract.functions.castVote(candidate_id).buildTransaction({
+            'from': web3.eth.accounts[0],  # The voter's account
+            'nonce': web3.eth.getTransactionCount(web3.eth.accounts[0]),
+            'gas': 2000000,
+            'gasPrice': Web3.toWei('50', 'gwei')
+        })
+        
+        # Sign the transaction
+        signed_txn = web3.eth.account.signTransaction(transaction, private_key)  # Ensure private key is set
+        
+        # Send the transaction
+        tx_hash = web3.eth.sendRawTransaction(signed_txn.rawTransaction)
+        
+        return f"Vote cast successfully! Transaction hash: {tx_hash.hex()}"
+    
+    except Exception as e:
+        return f"Error while casting vote: {str(e)}"
 
 # Logout route
 @app.route('/logout', methods=['GET', 'POST'])

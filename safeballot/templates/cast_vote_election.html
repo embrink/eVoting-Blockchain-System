@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ election_title }} - Cast Your Vote</title>
+</head>
+<body>
+    <h1>Election: {{ election_title }}</h1>
+
+    <h2>Select a candidate to vote for:</h2>
+    <form method="POST">
+        <ul>
+            {% for candidate in candidates %}
+                <li>
+                    <label>
+                        <input type="radio" name="candidate" value="{{ candidate }}" required>
+                        {{ candidate }}
+                    </label>
+                </li>
+            {% endfor %}
+        </ul>
+        
+        <button type="submit">Vote</button>
+    </form>
+</body>
+</html>

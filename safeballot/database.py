@@ -51,15 +51,19 @@ def create_database():
         ''')
         conn.commit()
 # update status for election to pull : ella 11/9
-def create_election(name, date):
-    """Add a new election to the elections table."""
+def create_election(name, date, candidates):
+    """Insert a new election into the elections table."""
     with create_connection() as conn:
         cursor = conn.cursor()
         cursor.execute('''
-            INSERT INTO elections (name, date, status)
-            VALUES (?, ?, ?)
-        ''', (name, date, 'Open'))  # Setting the initial status to 'Open'
+            INSERT INTO elections (title, start_time, end_time, candidates, is_active)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (name, date, date, candidates, 1))  # Make sure the date is used correctly
         conn.commit()
+        # Get the ID of the last inserted row (election_id)
+        election_id = cursor.lastrowid
+    return election_id
+
 #get election based off status : ella 11/9
 def get_current_elections():
     """Get all the current elections (optionally filter by 'Open' status)."""
@@ -70,19 +74,18 @@ def get_current_elections():
         elections = cursor.fetchall()
     return [{'id': row[0], 'name': row[1], 'date': row[2], 'status': row[3]} for row in elections]
 
-# Call this function once to create the elections table
 def create_elections_table():
-    """Create the elections table if it doesn't exist."""
     with create_connection() as conn:
         cursor = conn.cursor()
         cursor.execute('''
-        CREATE TABLE IF NOT EXISTS elections (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            date TEXT NOT NULL,
-            status TEXT NOT NULL,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
+            CREATE TABLE IF NOT EXISTS elections (
+                election_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                start_time TEXT NOT NULL,
+                end_time TEXT NOT NULL,
+                candidates TEXT NOT NULL,  -- Ensure this column exists
+                is_active INTEGER DEFAULT 1
+            );
         ''')
         conn.commit()
 

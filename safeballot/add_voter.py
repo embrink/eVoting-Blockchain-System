@@ -1,3 +1,11 @@
+# Function: add_voter
+# Purpose: Adds a new voter to the database using their SSN, zipcode, and driver ID. 
+# The function generates a unique voter ID and attempts to insert the new voter into the `voters` table.
+# Authors: Ella Brink, Lauren Wilson, Emma Bellai, Lucy DiSalvo 
+# Version History:
+# - Version 1.0 (Sprint 2): Initial version created by Ella Brink 
+# - Version 1.1 (Sprint 4): Added documentation by Lucy DiSalvo 
+
 from database import add_voter
 #manually load database
 # Sample voter information

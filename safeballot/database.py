@@ -1,3 +1,16 @@
+# File: database.py
+# Purpose: This file contains functions to manage voters and elections within a SQLite-based voting system.
+# It includes functionality for adding voters, retrieving voter information, creating elections, and managing the database schema.
+# Authors: 
+# Version History:
+# - Version 1.0 (Sprint 3): Initial version created by Ella Brink
+# - Version 1.1 (Sprint 3): Fixed create elections bug, Elections now displayed on webpage by Lauren Wilson
+# - Version 1.2 (Sprint 3): Voters now stored correctly in database after signing up by Lucy DiSalvo 
+# - Version 1.3 (Sprint 3): Manually add voters to database and print statements for testing by Lucy DiSalvo 
+# - Version 1.4 (Sprint 4): Added documentation by Lucy DiSalvo 
+
+
+
 import sqlite3
 import uuid  # For generating unique voter IDs
 

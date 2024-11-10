@@ -1,3 +1,13 @@
+# File: app.py
+# Purpose: This file contains the Flask application for the voting system.
+#  It manages routes for logging in different user roles (admin, auditor, voter), creating elections, viewing current elections, managing voter registration, and handling sessions for users.
+# Authors: Ella Brink, Lauren Wilson, Emma Bellai, Lucy DiSalvo
+# Version History:
+# - Version 1.0 (Sprint 2): Initial version created by Ella Brink
+# - Version 1.1 (Sprint 2): Fixed Admin login bug, Admin using 'adminid' can now sign in by Lucy DiSalvo
+# - Version 1.2 (Sprint 3): Fixed Voter login, voters saved in database can now log in by Lucy DiSalvo 
+# - Version 1.3 (Sprint 4): Added reroute to /view_electionsAu for auditor user by Lucy DiSalvo 
+
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from database import add_voter, get_voter, create_election, get_current_elections, create_database, create_elections_table, get_all_voters  # Import the database functions
 

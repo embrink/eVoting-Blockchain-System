@@ -1,3 +1,11 @@
+# File: main.py
+# Purpose: This file serves as the entry point for the voting system application, where users can choose their role (voter, admin, auditor) and interact with the system. 
+# Based on the role selected, the script facilitates login, election actions, voting, and election management.
+# Authors: Ella Brink, Lauren Wilson, Emma Bellai, Lucy DiSalvo
+# Version History:
+# - Version 1.0 (Sprint 2): Initial version created by Ella Brink
+# - Version 1.1 (Sprint 4): Added documentation by Lucy DiSalvo 
+
 from voter import Voter
 from admin import Admin
 from auditor import Auditor

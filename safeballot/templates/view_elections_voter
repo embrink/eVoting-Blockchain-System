@@ -1,3 +1,12 @@
+<!-- 
+File: admin_dashboard.html
+Purpose: This file contains the HTML structure for the Admin's Dashboard, where the admin can create new elections, view existing elections, and log out.
+Authors: Ella Brink, Lauren Wilson, Emma Bellai, Lucy DiSalvo 
+Version History:
+- Version 1.0 (Sprint 2): Initial version created by Ella Brink 
+- Version 1.1 (Sprint 3): Updated routing to login HTML page by Lucy DiSalvo 
+- Version 1.2 (Sprint 4): Added Candidate View by Ella Brink
+-->
 <!DOCTYPE html>
 <html lang="en">
 <head>

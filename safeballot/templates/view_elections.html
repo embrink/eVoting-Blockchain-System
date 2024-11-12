@@ -1,44 +1,47 @@
 <!-- 
-File: view_elections.html
+File: view_elections_Admin.html
 Purpose: This file contains the HTML structure for an Admin's view elections page, where they can view elections. 
 Authors: Ella Brink, Lauren Wilson, Emma Bellai, Lucy DiSalvo 
 Version History:
 - Version 1.0 (Sprint 3): Initial version created by Ella Brink 
--->
-
-<!DOCTYPE html>
+--><!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Current Elections</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}"> <!-- Optional CSS file -->
-</head>
-<body>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Current Elections</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    </head>
+    <body>
+        
+        <h1>Current Elections</h1>
     
-    <h1>Current Elections</h1>
-
-    <table>
-        <thead>
-            <tr>
-                <th>Election Name</th>
-                <th>Date</th>
-                <th>Candidates</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for election in elections %}
-            <tr>
-                <td>{{ election.name }}</td>
-                <td>{{ election.date }}</td>
-                <td>{{ election.candidates }}</td>
-                <td>{{ election.status }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-    <p><a href="{{ url_for('admin_dashboard') }}">Back to Admin Dashboard</a></p> <!-- Link to return to admin dashboard -->
-</body>
-</html>
+        <table>
+            <thead>
+                <tr>
+                    <th>Election Name</th>
+                    <th>Date</th>
+                    <th>Candidates</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for election in elections %}
+                <tr>
+                    <td>{{ election.name }}</td>
+                    <td>{{ election.date }}</td>
+                    <td>
+                        {% for candidate in election.candidates %}
+                            {{ candidate }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>{{ election.status }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    
+        <p><a href="{{ url_for('admin_dashboard') }}">Back to Admin Dashboard</a></p>
+    </body>
+    </html>
+    

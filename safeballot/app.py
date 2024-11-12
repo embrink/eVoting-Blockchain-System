@@ -7,9 +7,14 @@
 # - Version 1.1 (Sprint 2): Fixed Admin login bug, Admin using 'adminid' can now sign in by Lucy DiSalvo
 # - Version 1.2 (Sprint 3): Fixed Voter login, voters saved in database can now log in by Lucy DiSalvo 
 # - Version 1.3 (Sprint 4): Added reroute to /view_electionsAu for auditor user by Lucy DiSalvo 
+# - Version 1.4 (Sprint 4): Added reroute to /view_elections_voter for voter user by Ella Brink 
+# - Version 1.5 (Sprint 4): Revise reroute to /admin_dashboard for auditor user by Ella Brink
+# - Version 1.6 (Sprint 4): Added /cast_vote route by Ella Brink
+# - Version 1.7 (Sprint 4): Added /submit_vote, revised /view_elections_admin, update database imports by Ella Brink
+
 
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from database import add_voter, get_voter, create_election, get_current_elections, create_database, create_elections_table, get_all_voters  # Import the database functions
+from database import add_voter, get_voter, create_election, get_current_elections, create_database, create_elections_table, get_all_voters
 
 
 
@@ -34,7 +39,6 @@ def login():
         #LOGIN OPTIONS
         if role == 'admin':
             user_id = request.form['user_id']  # Get user ID from form
-            print(f"Admin ID entered: {user_id}")  # Debugging statement
             if user_id == ADMIN_ID:  # Validate admin ID
                 session['admin_name'] = user_id  # Store admin name in session
                 return redirect(url_for('admin_dashboard'))  # Redirect to admin dashboard
@@ -72,19 +76,43 @@ def login():
     return render_template('login.html')  # Render the login page template
 
 # Admin dashboard route
-@app.route('/admin_dashboard')
+@app.route('/admin_dashboard', methods=['GET', 'POST'])
 def admin_dashboard():
-    if 'admin_name' in session:
-        return render_template('admin_dashboard.html', admin_name=session['admin_name'])
-    else:
-        flash("You need to log in as admin first.", "error")  # Flash an error if not logged in
-        return redirect(url_for('login'))
-# View current elections route
+    if 'admin_name' not in session:
+        flash("Please log in as an admin.", "error")
+        return redirect(url_for('login'))  # Redirect to login if not logged in
+
+    if request.method == 'POST':
+        # Handle the form submission to create a new election
+        name = request.form['name']
+        date = request.form['date']
+        
+        # Retrieve each candidate individually
+        candidate1 = request.form.get('candidate1')
+        candidate2 = request.form.get('candidate2')
+        candidate3 = request.form.get('candidate3', '')  # Optional, defaults to empty
+        candidate4 = request.form.get('candidate4', '')  # Optional, defaults to empty
+
+        # Call create_election with separate parameters for each candidate
+        election_id = create_election(name, date, candidate1, candidate2, candidate3, candidate4)
+        
+        flash("Election created successfully!", "success")
+        return redirect(url_for('admin_dashboard'))  # Redirect to reload the dashboard
+
+    # Render the admin dashboard page on a GET request
+    return render_template('admin_dashboard.html', admin_name=session['admin_name'])
+
+
+#view election for admin 
 @app.route('/view_elections')
 def view_elections():
-    elections = get_current_elections()  # Fetch current elections from the database
-    return render_template('view_elections.html', elections=elections)  # Render the view elections page
-
+    if 'admin_name' in session:
+        elections = get_current_elections()  # Fetch current elections with candidates
+        return render_template('view_elections.html', elections=elections)
+    else:
+        flash("You need to log in as admin first.", "error")
+        return redirect(url_for('login'))
+#Auditor view of elections
 @app.route('/view_electionsAu')
 def view_elections_auditor():
     elections = get_current_elections()  # Fetch current elections from the database
@@ -104,6 +132,8 @@ def voter_dashboard():
 def view_elections_voter():
     elections = get_current_elections()  # Fetch current elections from the database
     return render_template('view_elections_voter.html', elections=elections)  # Render the view elections page
+
+
 
 # Signup route for new voters
 @app.route('/signup', methods=['GET', 'POST'])

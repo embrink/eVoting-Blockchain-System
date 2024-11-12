@@ -1,3 +1,10 @@
+
+# File: admin.py
+# Purpose: This file contains the Admin class which manages administrative functions in the voting system, including login, election creation, and posting election results. It interacts with the SQLite database for election management and a blockchain contract to retrieve election results.
+# Authors: Ella Brink, Lauren Wilson, Emma Bellai, Lucy DiSalvo
+# Version History:
+# - Version 1.0 (Sprint 2): Initial version created by Ella Brink
+
 import sqlite3
 from config import load_contract
 from database import create_connection  # Assuming create_connection is defined in database.py

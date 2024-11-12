@@ -1,3 +1,12 @@
+# File: voter.py
+# Purpose: This file defines the Voter class, which handles voter authentication, viewing active elections, and casting votes on the blockchain.
+# Authors: Ella Brink, Lauren Wilson, Emma Bellai, Lucy DiSalvo
+# Version History:
+# - Version 1.0 (Sprint 2): Initial version created by Ella Brink
+# - Version 1.1 (Sprint 4): Added Web3 functionality for voting and database interaction by Lucy DiSalvo
+# - Version 1.2 (Sprint 4): Added documentation by Lucy DiSalvo 
+
+
 import sqlite3
 from web3 import Web3
 

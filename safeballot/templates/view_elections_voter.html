@@ -1,40 +1,89 @@
+<!-- 
+File: cast_vote_election.html
+Purpose: This file contains the HTML structure for Voter to cast their vote after selecting an election.
+Authors: Ella Brink, Lauren Wilson, Emma Bellai, Lucy DiSalvo 
+Version History:
+- Version 1.0 (Sprint 3): Initial version created by Ella Brink
+- Version 1.2 (Sprint 4): Revised to list candidate and link to cast vote template by Ella Brink
+-->
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Current Elections</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}"> <!-- Optional CSS file -->
-</head>
-<body>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Current Elections</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    </head>
+    <body>
+        <h1>Current Elections</h1>
     
-
+        <table>
+            <thead>
+                <tr>
+                    <th>Election Name</th>
+                    <th>Date</th>
+                    <th>Candidate 1</th>
+                    <th>Candidate 2</th>
+                    <th>Candidate 3</th>
+                    <th>Candidate 4</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for election in elections %}
+                <tr>
+                    <td>{{ election.name }}</td>
+                    <td>{{ election.date }}</td>
+                    
+                    <!-- Candidate 1 -->
+                    <td>
+                        {% if election.candidate1 %}
+                            {{ election.candidate1 }}
+                        {% else %}
+                            
+                        {% endif %}
+                    </td>
     
-    <h1>Current Elections</h1>
+                    <!-- Candidate 2 -->
+                    <td>
+                        {% if election.candidate2 %}
+                            {{ election.candidate2 }}
+                        {% else %}
+                            
+                        {% endif %}
+                    </td>
+    
+                    <!-- Candidate 3 -->
+                    <td>
+                        {% if election.candidate3 %}
+                            {{ election.candidate3 }}
+                        {% else %}
+                            
+                        {% endif %}
+                    </td>
+    
+                    <!-- Candidate 4 -->
+                    <td>
+                        {% if election.candidate4 %}
+                            {{ election.candidate4 }}
+                        {% else %}
+                            
+                        {% endif %}
+                    </td>
+    
+                    <td>{{ election.status }}</td>
+                    <td>{{ election.created_at }}</td>
+                    <td>
+                        <!-- Vote button: Navigate to the cast vote page for the selected election -->
+                        <p><a href="{{ url_for('cast', election_id=election.id) }}">Vote</a></p>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Election Name</th>
-                <th>Date</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for election in elections %}
-            <tr>
-                <td>{{ election.name }}</td>
-                <td>{{ election.date }}</td>
-                <td>{{ election.status }}</td>
-                <td>
-                    <!-- Place the buttons inside the loop to reference the specific election -->
-                    <button onclick="window.location.href='/vot/{{ election.id }}'">Vote</button>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-    <p><a href="{{ url_for('voter_dashboard') }}">Back to Voter Dashboard</a></p> <!-- Link to return to admin dashboard -->
-</body>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    
+        <p><a href="{{ url_for('voter_dashboard') }}">Back to Voter Dashboard</a></p>
+    </body>
 </html>

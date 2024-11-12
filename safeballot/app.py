@@ -128,12 +128,10 @@ def auditor_dashboard():
 def voter_dashboard():
     return render_template('voter_dashboard.html')  # Render the voter dashboard template
 
-@app.route('/view_elections_Voter')
+@app.route('/view_elections_voter')
 def view_elections_voter():
-    elections = get_current_elections()  # Fetch current elections from the database
-    return render_template('view_elections_voter.html', elections=elections)  # Render the view elections page
-
-
+    elections = get_current_elections() 
+    return render_template('view_elections_voter.html', elections=elections)
 
 # Signup route for new voters
 @app.route('/signup', methods=['GET', 'POST'])
@@ -151,22 +149,32 @@ def signup():
     return render_template('signup.html')  # Render the signup page
 
 #cast vote
-@app.route('/cast_vote_election/<int:election_id>', methods=['GET', 'POST'])
-def cast_vote_election(election_id):
-    conn = sqlite3.connect('database/voting_system.db')
-    cursor = conn.cursor()
+@app.route('/cast/<int:election_id>', methods=['GET', 'POST'])
+def cast(election_id):
+    # Fetch elections from the database (using your get_current_elections function)
+    elections = get_current_elections()
 
-    # Fetch election details and candidates
-    cursor.execute("SELECT title, candidates FROM elections WHERE election_id = ?", (election_id,))
-    election = cursor.fetchone()
+    # Find the specific election by ID (you can filter or loop through elections)
+    election = next((e for e in elections if e['id'] == election_id), None)
 
-    if election:
-        # Split the candidates string into a list
-        candidates = election[1].split(', ')  # or use json.loads(election[1]) if using JSON serialization
-        return render_template('cast_vote_election.html', election_title=election[0], candidates=candidates, election_id=election_id)
-    else:
-        flash('Election not found', 'error')
-        return redirect(url_for('view_elections'))
+    if not election:
+        flash("Election not found.", "error")
+        return redirect(url_for('view_elections_voter'))
+
+    if request.method == 'POST':
+        # Handle the vote submission
+        selected_candidate = request.form['candidate']
+        # You can call a function to submit the vote here, like submit_vote_to_db
+        submit_vote_to_db(election_id, selected_candidate)  # Assuming this function exists
+        
+        flash('Vote submitted successfully!', 'success')
+        return redirect(url_for('view_elections_voter'))
+
+    # If it's a GET request, render the election and candidates
+    candidates = [election['candidate1'], election['candidate2'], election['candidate3'], election['candidate4']]
+    candidates = [candidate for candidate in candidates if candidate]  # Filter out empty candidates
+
+    return render_template('cast.html', election_title=election['name'], candidates=candidates, election_id=election_id)
 
 #send vote to contract
 @app.route('/submit_vote/<int:election_id>', methods=['POST'])

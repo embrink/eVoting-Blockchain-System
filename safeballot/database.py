@@ -10,7 +10,8 @@
 # - Version 1.4 (Sprint 4): Added documentation by Lucy DiSalvo 
 # - Version 1.5 (Sprint 4): Revise Database to include Candidates by Ella Brink
 # - Version 1.6 (Sprint 4): Added create_election_table, get_current_elections by Ella Brink
-# - Version 1.6 (Sprint 4): Modified create_election_table, create_election, create_candidate_table, added add_candidate function by Ella Brink
+# - Version 1.6.1 (Sprint 4): Modified create_election_table, create_election, create_candidate_table, added add_candidate function by Ella Brink
+# - Version 1.7 (Sprint 4): Modified database to hold candidates and correctly populate by Ella Brink
 
 
 
@@ -86,20 +87,8 @@ def create_elections_table():
             );
         ''')
         conn.commit()
-    print("Elections table created or already exists.")  # This line helps confirm execution
-
 create_elections_table()
 
-def check_tables():
-    with create_connection() as conn:
-        cursor = conn.cursor()
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
-        tables = cursor.fetchall()
-        print("Existing tables:", tables)  # Should include 'elections' if created
-
-check_tables()
-
-# Add an election with candidates as a comma-separated list
 # Add an election with candidates as separate arguments
 def create_election(name, date, candidate1, candidate2, candidate3=None, candidate4=None):
     """Insert a new election with up to 4 candidates, setting None for any missing candidates."""
@@ -120,35 +109,34 @@ def create_election(name, date, candidate1, candidate2, candidate3=None, candida
         election_id = cursor.lastrowid
         print(f"Election created with ID: {election_id}")
         return election_id
-
      
+import sqlite3
+
 def get_current_elections():
-    """Retrieve all current elections with their candidates and status."""
+    # Use 'with' to automatically handle closing the connection
     with create_connection() as conn:
         cursor = conn.cursor()
-        cursor.execute('''
-            SELECT election_id, name, date, candidate1, candidate2, candidate3, candidate4, status
-            FROM elections
-        ''')
-        elections = cursor.fetchall()
+        # Fetch all columns for each election where status is 'active'
+        cursor.execute("SELECT * FROM elections WHERE status = 'active'")
+        rows = cursor.fetchall()
 
-    # Convert the results into a list of dictionaries
-    election_list = []
-    for row in elections:
-        election_id, name, date, candidate1, candidate2, candidate3, candidate4, status = row
-        # Filter out None values to create the list of candidates
-        candidates = [c for c in [candidate1, candidate2, candidate3, candidate4] if c]
-        election_list.append({
-            'election_id': election_id,
-            'name': name,
-            'date': date,
-            'candidates': candidates,
-            'status': status
-        })
-
-    return election_list
-
-
+        # Convert the rows to a list of dictionaries
+        elections = [
+            {
+                'id': row[0],
+                'name': row[1],
+                'date': row[2],
+                'candidate1': row[3],
+                'candidate2': row[4],
+                'candidate3': row[5],
+                'candidate4': row[6],
+                'status': row[7],
+                'created_at': row[8]
+            }
+            for row in rows
+        ]
+    # Return the elections list after closing the connection (handled by 'with')
+    return elections
 
 def get_all_voters():
     conn = create_connection()

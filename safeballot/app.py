@@ -15,7 +15,8 @@
 
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from database import add_voter, get_voter, create_election, get_current_elections, create_database, create_elections_table, get_all_voters
-
+from voter import Voter
+from web3 import Web3
 
 
 app = Flask(__name__)
@@ -23,6 +24,105 @@ app.secret_key = 'cis454'  # Set a secret key for session management
 
 # Pre-defined admin ID (for demonstration purposes, use a secure method in production)
 ADMIN_ID = 'adminid'  # Replace with your actual admin ID
+
+provider_url = 'http://localhost:7545'  # Example for Ganache
+contract_address = '0x2AeFE84084b722a89C90fADee9C39Db9CE37055e'  # Replace with your actual contract address
+contract_abi = [{
+      "inputs": [],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "candidates",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "voteCount",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": True
+    },
+    {
+      "inputs": [],
+      "name": "candidatesCount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": True
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "voters",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": True
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "name",
+          "type": "string"
+        }
+      ],
+      "name": "addCandidate",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "candidateId",
+          "type": "uint256"
+        }
+      ],
+      "name": "vote",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }]
+
 
 # Home route
 @app.route('/')
@@ -111,7 +211,9 @@ def view_elections():
         return render_template('view_elections.html', elections=elections)
     else:
         flash("You need to log in as admin first.", "error")
-        return redirect(url_for('login'))
+        return redirect(url_for('login.html'))
+    
+
 #Auditor view of elections
 @app.route('/view_electionsAu')
 def view_elections_auditor():
@@ -165,18 +267,47 @@ def cast(election_id):
         # Handle the vote submission
         selected_candidate = request.form['candidate']
         # You can call a function to submit the vote here, like submit_vote_to_db
-        submit_vote_to_db(election_id, selected_candidate)  # Assuming this function exists
-        
-        flash('Vote submitted successfully!', 'success')
-        return redirect(url_for('view_elections_voter'))
+        #submit_vote_to_db(election_id, selected_candidate)  # Assuming this function exists
+        voter_id = session.get('voter_id')
+        if voter_id:
+            # Get the voter's details from the database (replace this with actual DB query)
+            voter_details = get_voter_by_id(voter_id)  # Implement this function to get the voter details
+            if voter_details:
+                ssn, driver_id, zipcode, voter_account, private_key = voter_details
+                contract_address = "0x1234567890abcdef1234567890abcdef12345678"  # Replace with your actual contract address
+                contract_abi = contract_abi
 
+                # Create an instance of the Voter class
+                voter = Voter(ssn, driver_id, zipcode, voter_account, private_key, contract_address, contract_abi, provider_url)
+                # Cast the vote using the Voter class method
+                voter.cast_vote(selected_candidate)  # This will send the vote to the blockchain
+                
+                flash('Vote submitted successfully!', 'success')
+                return redirect(url_for('view_elections_voter'))
+            else:
+                flash("Voter not found.", "error")
+                return redirect(url_for('login'))
+        else:
+            flash("Please log in to vote.", "error")
+            return redirect(url_for('login'))
+
+        #flash('Vote submitted successfully!', 'success')
+        #return redirect(url_for('view_elections_voter'))
     # If it's a GET request, render the election and candidates
     candidates = [election['candidate1'], election['candidate2'], election['candidate3'], election['candidate4']]
     candidates = [candidate for candidate in candidates if candidate]  # Filter out empty candidates
 
     return render_template('cast.html', election_title=election['name'], candidates=candidates, election_id=election_id)
 
-#send vote to contract
+def get_candidate_id(selected_candidate):
+    # Mapping candidate names to their respective IDs
+    candidates = {
+        "Alice": 1,
+        "Bob": 2
+    }
+    return candidates.get(selected_candidate, None)
+
+#send vote to blockchain route
 @app.route('/submit_vote/<int:election_id>', methods=['POST'])
 def submit_vote(election_id):
     selected_candidate = request.form['candidate']
@@ -184,14 +315,14 @@ def submit_vote(election_id):
     # Call the smart contract to cast the vote on the blockchain
     try:
         # Assuming you have a web3 instance set up
-        web3 = Web3(Web3.HTTPProvider('http://localhost:8545'))  # Replace with your provider
-        contract = web3.eth.contract(address=your_contract_address, abi=your_contract_abi)
+        web3 = Web3(Web3.HTTPProvider('http://localhost:7545'))  # Replace with your provider
+        contract = web3.eth.contract(address=contract_address, abi=contract_abi)
         
         # Get the candidate ID (this would depend on how the candidates are stored in your contract)
         candidate_id = get_candidate_id(selected_candidate)  # Implement this mapping
         
         # Send the vote to the blockchain
-        transaction = contract.functions.castVote(candidate_id).buildTransaction({
+        transaction = contract.functions.vote(candidate_id).buildTransaction({
             'from': web3.eth.accounts[0],  # The voter's account
             'nonce': web3.eth.getTransactionCount(web3.eth.accounts[0]),
             'gas': 2000000,

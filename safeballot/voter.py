@@ -1,4 +1,14 @@
+# File: voter.py
+# Purpose: This file defines the Voter class, which handles voter authentication, viewing active elections, and casting votes on the blockchain.
+# Authors: Ella Brink, Lauren Wilson, Emma Bellai, Lucy DiSalvo
+# Version History:
+# - Version 1.0 (Sprint 2): Initial version created by Ella Brink
+# - Version 1.1 (Sprint 4): Added Web3 functionality for voting and database interaction by Lucy DiSalvo
+# - Version 1.2 (Sprint 4): Added documentation by Lucy DiSalvo 
+
+
 import sqlite3
+from web3 import Web3
 
 class Voter:
     def __init__(self, ssn, driver_id, zipcode, voter_account, private_key, contract):
@@ -17,22 +27,17 @@ class Voter:
         result = cursor.fetchone()
         conn.close()
         return result is not None
+    
+#add display elections for html contract : ella 11/9
 
-    def view_elections(self):
-        conn = sqlite3.connect('database/voting_system.db')
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM elections WHERE is_active=1")
-        elections = cursor.fetchall()
-        conn.close()
-        return elections
-
+#send to contract
     def cast_vote(self, candidate_id):
         transaction = self.contract.functions.castVote(candidate_id).buildTransaction({
             'from': self.voter_account,
-            'nonce': web3.eth.get_transaction_count(self.voter_account),
+            'nonce': Web3.eth.get_transaction_count(self.voter_account),
             'gas': 2000000,
-            'gasPrice': web3.toWei('50', 'gwei')
+            'gasPrice': Web3.toWei('50', 'gwei')
         })
-        signed_txn = web3.eth.account.sign_transaction(transaction, self.private_key)
-        tx_hash = web3.eth.send_raw_transaction(signed_txn.rawTransaction)
+        signed_txn = Web3.eth.account.sign_transaction(transaction, self.private_key)
+        tx_hash = Web3.eth.send_raw_transaction(signed_txn.rawTransaction)
         print(f"Vote transaction hash: {tx_hash.hex()}")

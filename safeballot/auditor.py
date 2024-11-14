@@ -1,3 +1,9 @@
+# File: auditor.py
+# Purpose: This file contains the Auditor class which provides functionality for the auditor role in the voting system. The class includes methods for auditor login, pulling voting statistics from the blockchain, and approving elections in the local SQLite database.
+# Authors: Ella Brink, Lauren Wilson, Emma Bellai, Lucy DiSalvo
+# Version History:
+# - Version 1.0 (Sprint 2): Initial version created by Ella Brink
+
 import sqlite3
 from config import load_contract
 
@@ -9,6 +15,7 @@ class Auditor:
     def login(self):
         # Auditor login check from SQLite database
         conn = sqlite3.connect('database/voting_system.db')
+        print("Conn:", conn) 
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM auditors WHERE auditor_id=?", (self.auditor_id,))
         result = cursor.fetchone()

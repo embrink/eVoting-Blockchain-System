@@ -1,3 +1,10 @@
+# File: config.py
+# Purpose: This file provides functions to set up a connection with the blockchain using Web3, load the smart contract ABI, and initialize the contract with the contract address.
+# Authors: Ella Brink, Lauren Wilson, Emma Bellai, Lucy DiSalvo
+# Version History:
+# - Version 1.0 (Sprint 3): Initial version created by Ella Brink
+# - Version 1.1 (Sprint 4): Added documentation by Lucy DiSalvo 
+
 from web3 import Web3
 import json
 

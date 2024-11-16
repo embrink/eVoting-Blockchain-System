@@ -4,6 +4,7 @@
 # Authors: Ella Brink, Lauren Wilson, Emma Bellai, Lucy DiSalvo
 # Version History:
 # - Version 1.0 (Sprint 2): Initial version created by Ella Brink
+# - Version 1.1 (Sprint 2): Create election function revised by Ella Brink
 
 import sqlite3
 from config import load_contract

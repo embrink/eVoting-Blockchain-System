@@ -1,3 +1,13 @@
+<!-- 
+# File: app.py
+# Purpose: This file contains the Flask application for the voting system.
+#  It manages routes for logging in different user roles (admin, auditor, voter), creating elections, viewing current elections, managing voter registration, and handling sessions for users.
+# Authors: Ella Brink, Lauren Wilson, Emma Bellai, Lucy DiSalvo
+# Version History:
+# - Version 1.0 (Sprint 2): Initial version created by Ella Brink
+# - Version 1.1 (Sprint 3): Added code for flash messages for success/failure to sign up by Lauren Wilson
+--> 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,6 +23,17 @@
     </script>
 </head>
 <body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-message">
+                <p>
+                    {% for category, message in messages %}
+                        <p class="{{ category }}">{{ message }}</p>
+                    {% endfor %}
+                </p>
+            </div>
+        {% endif %}
+    {% endwith %}
     <h1>Login</h1>
 
     <form method="POST" action="{{ url_for('login') }}">
@@ -50,5 +71,6 @@
 
         <input type="submit" value="Login">
     </form>
+
 </body>
 </html>

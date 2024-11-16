@@ -6,20 +6,92 @@ Version History:
 - Version 1.0 (Sprint 2): Initial version created by Ella Brink 
 - Version 1.1 (Sprint 2) Added Pattern/Error Message for Driver ID by Lauren Wilson
 - Version 1.2 (Sprint 3) Added Placeholders for all Inputs by Lauren Wilson
+- Version 1.3 (Sprint 3) Added popup message styling and code for Flash by Lauren Wilson
 --> 
 
 <!-- signup.html -->
-<form method="POST" action="/signup">
-    <label for="ssn">SSN:</label>
-    <input type="text" id="ssn" name="ssn" minlength="9" maxlength="11" pattern="\d{3}-\d{2}-\d{4}" title="Format: XXX-XX-XXXX"
-    placeholder="XXX-XX-XXXX" required>
-    
-    <label for="zipcode">Zip Code:</label>
-    <input type="text" id="zipcode" name="zipcode" pattern="\d{5}" title="Five-digit ZIP code" 
-    placeholder="XXXXX" required>
-    
-    <label for="driver_id">Driver ID:</label>
-    <input type="text" id="driver_id" name="driver_id" pattern="^D\d{7}$" placeholder="DXXXXXXX" required>
-    
-    <input type="submit" value="Sign Up">
-</form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title> 
+
+    <style>
+        /* Popup message styling */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            z-index: 1000;
+        }
+        .popup.active {
+            display: block;
+        }
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        .overlay.active {
+            display: block;
+        }
+        .close-btn {
+            margin-top: 10px;
+            padding: 5px 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Sign Up</h1>
+
+    <form method="POST" action="/signup">
+        <label for="ssn">SSN:</label>
+        <input type="text" id="ssn" name="ssn" minlength="9" maxlength="11" pattern="\d{3}-\d{2}-\d{4}" title="Format: XXX-XX-XXXX"
+        placeholder="XXX-XX-XXXX" required>
+        
+        <label for="zipcode">Zip Code:</label>
+        <input type="text" id="zipcode" name="zipcode" pattern="\d{5}" title="Five-digit ZIP code" 
+        placeholder="XXXXX" required>
+        
+        <label for="driver_id">Driver ID:</label>
+        <input type="text" id="driver_id" name="driver_id" pattern="^D\d{7}$" placeholder="DXXXXXXX" required>
+        
+        <input type="submit" value="Sign Up">
+    </form>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="overlay active"></div>
+        <div class="popup active">
+            {% for category, message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+            <form method="GET" action="/login">
+                <button type="submit" class="close-btn">OK</button>
+            </form>
+        </div>
+    {% endif %}
+    {% endwith %}
+
+</body>
+</html>
+
+

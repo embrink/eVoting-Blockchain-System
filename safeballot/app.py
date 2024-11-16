@@ -11,6 +11,7 @@
 # - Version 1.5 (Sprint 4): Revise reroute to /admin_dashboard for auditor user by Ella Brink
 # - Version 1.6 (Sprint 4): Added /cast_vote route by Ella Brink
 # - Version 1.7 (Sprint 4): Added /submit_vote, revised /view_elections_admin, update database imports by Ella Brink
+# - Version 1.8 (Sprint 4): Added flash messages for signup success and failure by Lauren wilson
 
 
 from flask import Flask, render_template, request, redirect, url_for, session, flash
@@ -244,9 +245,11 @@ def signup():
         driver_id = request.form['driver_id']
         
         if add_voter(ssn, zipcode, driver_id):
-            return redirect(url_for('login'))  # Redirect to login page after successful signup
+            flash('Signup successful! You can now log in.', 'success')  # Flash success message
+            return redirect(url_for('signup'))  # Redirect to login page after successful signup
         else:
-            return "Voter with this SSN already exists", 400  # Bad request error
+            flash("Voter with this SSN already exists.", "error")  # Error message
+            return redirect(url_for('signup'))  # Redirect back to signup page
 
     return render_template('signup.html')  # Render the signup page
 

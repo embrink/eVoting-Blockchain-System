@@ -5,8 +5,6 @@
 # - Version 1.0 (Sprint 2): Initial version created by Ella Brink
 # - Version 1.1 (Sprint 4): Added Web3 functionality for voting and database interaction by Lucy DiSalvo
 # - Version 1.2 (Sprint 4): Added documentation by Lucy DiSalvo 
-# - Version 1.3 (Sprint 4): Updated voter information, added contract_address, contract_abi, 
-# and provider_url for blockchain/ganache integration by Lucy DiSalvo
 
 
 import sqlite3

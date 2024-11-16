@@ -12,6 +12,7 @@
 # - Version 1.6 (Sprint 4): Added create_election_table, get_current_elections by Ella Brink
 # - Version 1.6.1 (Sprint 4): Modified create_election_table, create_election, create_candidate_table, added add_candidate function by Ella Brink
 # - Version 1.7 (Sprint 4): Modified database to hold candidates and correctly populate by Ella Brink
+# - Version 1.8 (Sprint 4): Made driver's license ID requirement unique, eliminated duplicated IDs by Lauren Wilson
 
 
 
@@ -26,6 +27,10 @@ def create_connection():
 def add_voter(ssn, zipcode, driver_id):
     print(f"Attempting to add voter: SSN={ssn}, Zipcode={zipcode}, Driver ID={driver_id}")
     voter_id = str(uuid.uuid4())  # Generate a unique voter ID
+    # Check if the driver's license is already in use
+    if get_voter(driver_id):
+        print(f"Driver ID {driver_id} already exists in the database.")
+        return None
     conn = create_connection()
     cursor = conn.cursor()
     
@@ -43,6 +48,7 @@ def add_voter(ssn, zipcode, driver_id):
     finally:
         conn.close()
 
+
 def get_voter(ssn):
     conn = create_connection()
     cursor = conn.cursor()
@@ -51,6 +57,15 @@ def get_voter(ssn):
     print(f"Query result for SSN {ssn}: {voter}") #debugging statement 
     conn.close()
     return voter
+
+def get_voter(driver_id):
+    """Check if a driver's license is already registered."""
+    conn = create_connection()
+    cursor = conn.cursor()
+    cursor.execute('SELECT 1 FROM voters WHERE driver_id = ?', (driver_id,))
+    result = cursor.fetchone()
+    conn.close()
+    return result is not None
 
 # Call this function once to create the database and table of VOTERS
 def create_database():
@@ -63,7 +78,7 @@ def create_database():
             voter_id TEXT NOT NULL UNIQUE,  -- Added voter_id column
             ssn TEXT NOT NULL UNIQUE,
             zipcode TEXT NOT NULL,
-            driver_id TEXT NOT NULL,
+            driver_id TEXT NOT NULL UNIQUE,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
         ''')

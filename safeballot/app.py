@@ -13,6 +13,7 @@
 # - Version 1.7 (Sprint 4): Added /submit_vote, revised /view_elections_admin, update database imports by Ella Brink
 # - Version 1.8 (Sprint 4): Added flash messages for signup success and failure by Lauren wilson
 # - Version 1.9 (Sprint 4): Flashed error messages for both duplicate SSN or driver ID by Lauren Wilson
+# - Version 1.8 (Sprint 4): addressed duplicate name test case, time stap test case by Ella Brink
 
 
 from flask import Flask, render_template, request, redirect, url_for, session, flash
@@ -178,6 +179,8 @@ def login():
     return render_template('login.html')  # Render the login page template
 
 # Admin dashboard route
+from datetime import datetime
+
 @app.route('/admin_dashboard', methods=['GET', 'POST'])
 def admin_dashboard():
     if 'admin_name' not in session:
@@ -185,24 +188,52 @@ def admin_dashboard():
         return redirect(url_for('login'))  # Redirect to login if not logged in
 
     if request.method == 'POST':
-        # Handle the form submission to create a new election
-        name = request.form['name']
-        date = request.form['date']
-        
-        # Retrieve each candidate individually
-        candidate1 = request.form.get('candidate1')
-        candidate2 = request.form.get('candidate2')
-        candidate3 = request.form.get('candidate3', '')  # Optional, defaults to empty
-        candidate4 = request.form.get('candidate4', '')  # Optional, defaults to empty
+        # Retrieve form data
+        name = request.form.get('name', '').strip()
+        date = request.form.get('date', '').strip()
+        candidate1 = request.form.get('candidate1', '').strip()
+        candidate2 = request.form.get('candidate2', '').strip()
+        candidate3 = request.form.get('candidate3', '').strip()
+        candidate4 = request.form.get('candidate4', '').strip()
 
-        # Call create_election with separate parameters for each candidate
-        election_id = create_election(name, date, candidate1, candidate2, candidate3, candidate4)
-        
-        flash("Election created successfully!", "success")
-        return redirect(url_for('admin_dashboard'))  # Redirect to reload the dashboard
+        # Validate required fields
+        if not name or not date or not candidate1 or not candidate2:
+            flash("Please fill in all required fields.", "error")
+            return redirect(url_for('admin_dashboard'))
+        # Parse the date in MM/DD/YYYY format to a datetime.date object
+        date = date.strip()
+    # Parse the date in MM/DD/YYYY format to a datetime.date object
+        election_date = datetime.strptime(date, '%Y-%m-%d').date()
+    
+    # Compare the parsed date with today's date
+        if election_date < datetime.now().date():
+            flash("Election date cannot be in the past. Please select a future date.", "error")
+            return redirect(url_for('admin_dashboard'))
+      
+        # Fetch current elections
+        current_elections = get_current_elections()
+        if not current_elections:
+            flash("Failed to retrieve current elections. Please try again later.", "error")
+            return redirect(url_for('admin_dashboard'))
+
+        # Check for duplicate election names
+        existing_names = {election['name'].strip().lower() for election in current_elections}
+        if name.lower() in existing_names:
+            flash("An election with this name already exists. Please choose a different name.", "error")
+            return redirect(url_for('admin_dashboard'))
+
+        # Create a new election
+        # Use the normalized date (YYYY-MM-DD) for database insertion
+        election_id = create_election(name, election_date.strftime('%Y-%m-%d'), candidate1, candidate2, candidate3, candidate4)
+        if election_id:  # Assuming create_election returns an ID if successful
+            flash("Election created successfully!", "success")
+        else:
+            flash("Failed to create the election. Please try again.", "error")
+
+        return redirect(url_for('admin_dashboard'))
 
     # Render the admin dashboard page on a GET request
-    return render_template('admin_dashboard.html', admin_name=session['admin_name'])
+    return render_template('admin_dashboard.html', admin_name=session.get('admin_name'))
 
 
 #view election for admin 

@@ -26,6 +26,7 @@ app.secret_key = 'cis454'  # Set a secret key for session management
 
 # Pre-defined admin ID (for demonstration purposes, use a secure method in production)
 ADMIN_ID = 'adminid'  # Replace with your actual admin ID
+AUDITOR_ID = 'auditorid'
 
 provider_url = 'http://localhost:7545'  # Example for Ganache
 contract_address = '0x2AeFE84084b722a89C90fADee9C39Db9CE37055e'  # Replace with your actual contract address
@@ -149,9 +150,13 @@ def login():
                 return redirect(url_for('login'))  # Redirect back to login page
 
         elif role == 'auditor':
-            user_id = request.form['u_id']  # Get user ID from form
-            session['auditor_name'] = user_id  # Store auditor name in session
-            return redirect(url_for('auditor_dashboard'))  # Redirect to auditor dashboard
+            u_id = request.form['u_id']  # Get user ID from form
+            if u_id == AUDITOR_ID:
+              session['auditor_name'] = u_id  # Store auditor name in session
+              return redirect(url_for('auditor_dashboard'))  # Redirect to auditor dashboard
+            else:
+                flash("Invalid auditor ID, please try again.", "error")  # Flash error message
+                return redirect(url_for('login'))  # Redirect back to login page
 
         elif role == 'voter':
             ssn = request.form['ssn']          # Get SSN from form

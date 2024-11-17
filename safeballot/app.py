@@ -11,9 +11,9 @@
 # - Version 1.5 (Sprint 4): Revise reroute to /admin_dashboard for auditor user by Ella Brink
 # - Version 1.6 (Sprint 4): Added /cast_vote route by Ella Brink
 # - Version 1.7 (Sprint 4): Added /submit_vote, revised /view_elections_admin, update database imports by Ella Brink
-# - Version 1.8 (Sprint 4): Added flash messages for signup success and failure by Lauren wilson
+# - Version 1.8 (Sprint 4): Added flash messages for signup success and failure by Lauren Wilson
 # - Version 1.9 (Sprint 4): Flashed error messages for both duplicate SSN or driver ID by Lauren Wilson
-# - Version 1.8 (Sprint 4): addressed duplicate name test case, time stap test case by Ella Brink
+# - Version 2.0 (Sprint 4): Harcoded auditorid by Lauren Wilson
 
 
 from flask import Flask, render_template, request, redirect, url_for, session, flash
@@ -27,6 +27,7 @@ app.secret_key = 'cis454'  # Set a secret key for session management
 
 # Pre-defined admin ID (for demonstration purposes, use a secure method in production)
 ADMIN_ID = 'adminid'  # Replace with your actual admin ID
+AUDITOR_ID = 'auditorid'
 
 provider_url = 'http://localhost:7545'  # Example for Ganache
 contract_address = '0x2AeFE84084b722a89C90fADee9C39Db9CE37055e'  # Replace with your actual contract address
@@ -150,37 +151,39 @@ def login():
                 return redirect(url_for('login'))  # Redirect back to login page
 
         elif role == 'auditor':
-            user_id = request.form['u_id']  # Get user ID from form
-            session['auditor_name'] = user_id  # Store auditor name in session
-            return redirect(url_for('auditor_dashboard'))  # Redirect to auditor dashboard
+            u_id = request.form['u_id']  # Get user ID from form
+            if u_id == AUDITOR_ID:
+              session['auditor_name'] = u_id  # Store auditor name in session
+              return redirect(url_for('auditor_dashboard'))  # Redirect to auditor dashboard
+            else:
+                flash("Invalid auditor ID, please try again.", "error")  # Flash error message
+                return redirect(url_for('login'))  # Redirect back to login page
 
         elif role == 'voter':
-            ssn = request.form['ssn']          # Get SSN from form
-            zipcode = request.form['zipcode']  # Get Zipcode from form
-            driver_id = request.form['driver_id']  # Get Driver ID from form
-            
-            # Debugging statements
-            print(f"SSN: {ssn}, Zipcode: {zipcode}, Driver ID: {driver_id}")
+            ssn = request.form['ssn']
+            print(f"SSN received: {ssn}")
 
-            # Validate voter credentials
-            voter_info = get_voter(ssn)  # Get voter info based on SSN
-            print(f"Get_voter info", voter_info) #debugging statement 
+            voter_info = get_voter(ssn)
+            print(f"Debug: get_voter returned: {voter_info}")
+
+            if not voter_info:
+                flash("Voter not found. Please check your credentials.", "error")
+                return redirect(url_for('login'))
             
-            if (voter_info[1] == ssn and voter_info[2] == zipcode and voter_info[3] == driver_id):
-                session['voter_id'] = voter_info[0]  # Store voter ID in session
-                return redirect(url_for('voter_dashboard'))  # Redirect to voter dashboard
+            if voter_info[2] == ssn:
+                session['voter_id'] = voter_info[0]
+                flash('Signup successful! You can now log in.', 'success')
+                return redirect(url_for('voter_dashboard'))
             else:
-                flash("Invalid voter credentials, please try again.", "error")  # Flash error message
-                return redirect(url_for('login'))  # Redirect back to login page
-        else:
-            flash("Invalid role selected", "error")  # Flash error message
-            return redirect(url_for('login'))  # Redirect back to login page
-            
+                flash("Invalid voter credentials. Please try again.", "error")
+                return redirect(url_for('login'))
+
+    return render_template('login.html')
+
+
     return render_template('login.html')  # Render the login page template
 
 # Admin dashboard route
-from datetime import datetime
-
 @app.route('/admin_dashboard', methods=['GET', 'POST'])
 def admin_dashboard():
     if 'admin_name' not in session:
@@ -188,52 +191,24 @@ def admin_dashboard():
         return redirect(url_for('login'))  # Redirect to login if not logged in
 
     if request.method == 'POST':
-        # Retrieve form data
-        name = request.form.get('name', '').strip()
-        date = request.form.get('date', '').strip()
-        candidate1 = request.form.get('candidate1', '').strip()
-        candidate2 = request.form.get('candidate2', '').strip()
-        candidate3 = request.form.get('candidate3', '').strip()
-        candidate4 = request.form.get('candidate4', '').strip()
+        # Handle the form submission to create a new election
+        name = request.form['name']
+        date = request.form['date']
+        
+        # Retrieve each candidate individually
+        candidate1 = request.form.get('candidate1')
+        candidate2 = request.form.get('candidate2')
+        candidate3 = request.form.get('candidate3', '')  # Optional, defaults to empty
+        candidate4 = request.form.get('candidate4', '')  # Optional, defaults to empty
 
-        # Validate required fields
-        if not name or not date or not candidate1 or not candidate2:
-            flash("Please fill in all required fields.", "error")
-            return redirect(url_for('admin_dashboard'))
-        # Parse the date in MM/DD/YYYY format to a datetime.date object
-        date = date.strip()
-    # Parse the date in MM/DD/YYYY format to a datetime.date object
-        election_date = datetime.strptime(date, '%Y-%m-%d').date()
-    
-    # Compare the parsed date with today's date
-        if election_date < datetime.now().date():
-            flash("Election date cannot be in the past. Please select a future date.", "error")
-            return redirect(url_for('admin_dashboard'))
-      
-        # Fetch current elections
-        current_elections = get_current_elections()
-        if not current_elections:
-            flash("Failed to retrieve current elections. Please try again later.", "error")
-            return redirect(url_for('admin_dashboard'))
-
-        # Check for duplicate election names
-        existing_names = {election['name'].strip().lower() for election in current_elections}
-        if name.lower() in existing_names:
-            flash("An election with this name already exists. Please choose a different name.", "error")
-            return redirect(url_for('admin_dashboard'))
-
-        # Create a new election
-        # Use the normalized date (YYYY-MM-DD) for database insertion
-        election_id = create_election(name, election_date.strftime('%Y-%m-%d'), candidate1, candidate2, candidate3, candidate4)
-        if election_id:  # Assuming create_election returns an ID if successful
-            flash("Election created successfully!", "success")
-        else:
-            flash("Failed to create the election. Please try again.", "error")
-
-        return redirect(url_for('admin_dashboard'))
+        # Call create_election with separate parameters for each candidate
+        election_id = create_election(name, date, candidate1, candidate2, candidate3, candidate4)
+        
+        flash("Election created successfully!", "success")
+        return redirect(url_for('admin_dashboard'))  # Redirect to reload the dashboard
 
     # Render the admin dashboard page on a GET request
-    return render_template('admin_dashboard.html', admin_name=session.get('admin_name'))
+    return render_template('admin_dashboard.html', admin_name=session['admin_name'])
 
 
 #view election for admin 

@@ -11,7 +11,7 @@
 # - Version 1.5 (Sprint 4): Revise reroute to /admin_dashboard for auditor user by Ella Brink
 # - Version 1.6 (Sprint 4): Added /cast_vote route by Ella Brink
 # - Version 1.7 (Sprint 4): Added /submit_vote, revised /view_elections_admin, update database imports by Ella Brink
-# - Version 1.8 (Sprint 4): Added flash messages for signup success and failure by Lauren wilson
+# - Version 1.8 (Sprint 4): Added flash messages for signup success and failure by Lauren Wilson
 # - Version 1.9 (Sprint 4): Flashed error messages for both duplicate SSN or driver ID by Lauren Wilson
 # - Version 2.0 (Sprint 4): Harcoded auditorid by Lauren Wilson
 
@@ -160,27 +160,27 @@ def login():
                 return redirect(url_for('login'))  # Redirect back to login page
 
         elif role == 'voter':
-            ssn = request.form['ssn']          # Get SSN from form
-            zipcode = request.form['zipcode']  # Get Zipcode from form
-            driver_id = request.form['driver_id']  # Get Driver ID from form
-            
-            # Debugging statements
-            print(f"SSN: {ssn}, Zipcode: {zipcode}, Driver ID: {driver_id}")
+            ssn = request.form['ssn']
+            print(f"SSN received: {ssn}")
 
-            # Validate voter credentials
-            voter_info = get_voter(ssn)  # Get voter info based on SSN
-            print(f"Get_voter info", voter_info) #debugging statement 
+            voter_info = get_voter(ssn)
+            print(f"Debug: get_voter returned: {voter_info}")
+
+            if not voter_info:
+                flash("Voter not found. Please check your credentials.", "error")
+                return redirect(url_for('login'))
             
-            if (voter_info[1] == ssn and voter_info[2] == zipcode and voter_info[3] == driver_id):
-                session['voter_id'] = voter_info[0]  # Store voter ID in session
-                return redirect(url_for('voter_dashboard'))  # Redirect to voter dashboard
+            if voter_info[2] == ssn:
+                session['voter_id'] = voter_info[0]
+                flash('Signup successful! You can now log in.', 'success')
+                return redirect(url_for('voter_dashboard'))
             else:
-                flash("Invalid voter credentials, please try again.", "error")  # Flash error message
-                return redirect(url_for('login'))  # Redirect back to login page
-        else:
-            flash("Invalid role selected", "error")  # Flash error message
-            return redirect(url_for('login'))  # Redirect back to login page
-            
+                flash("Invalid voter credentials. Please try again.", "error")
+                return redirect(url_for('login'))
+
+    return render_template('login.html')
+
+
     return render_template('login.html')  # Render the login page template
 
 # Admin dashboard route

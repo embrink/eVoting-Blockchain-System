@@ -20,52 +20,72 @@
 import sqlite3
 import uuid  # For generating unique voter IDs
 
+
 def create_connection():
     conn = sqlite3.connect('voting_system.db')
     return conn
 
 def add_voter(ssn, zipcode, driver_id):
     print(f"Attempting to add voter: SSN={ssn}, Zipcode={zipcode}, Driver ID={driver_id}")
-    voter_id = str(uuid.uuid4())  # Generate a unique voter ID
-    # Check if the driver's license is already in use
-    if get_voter(driver_id):
+    
+    # Generate a unique voter ID
+    voter_id = str(uuid.uuid4())  
+    
+    # Check if the SSN or driver's license is already in use
+    if get_voter(ssn):
+        print(f"SSN {ssn} already exists in the database.")
+        return None
+    if get_voter_by_driverid(driver_id):
         print(f"Driver ID {driver_id} already exists in the database.")
         return None
+
+    # Create a new connection for the insert operation
     conn = create_connection()
     cursor = conn.cursor()
     
     try:
+        # Insert the new voter record into the database
         cursor.execute('''
             INSERT INTO voters (voter_id, ssn, zipcode, driver_id)
             VALUES (?, ?, ?, ?)
         ''', (voter_id, ssn, zipcode, driver_id))
-        conn.commit()
-        print(f"Voter added successfully: {voter_id}")  # Debugging
+        conn.commit()  # Commit the changes to the database
+        print(f"Voter added successfully: {voter_id}")  # Debugging output
         return voter_id  # Return the generated voter ID
     except sqlite3.IntegrityError:
-        # This error occurs if the SSN is already in the database
+        # Handle case where SSN or Driver ID is a duplicate
+        print(f"Error: SSN {ssn} or Driver ID {driver_id} already exists.")
         return None
     finally:
+        # Close the database connection
         conn.close()
 
 
 def get_voter(ssn):
+    """Check if a voter already exists by SSN."""
     conn = create_connection()
+    if conn is None:
+        print("Error! cannot create the database connection.")
+        return None
     cursor = conn.cursor()
-    cursor.execute('SELECT voter_id, ssn, zipcode, driver_id FROM voters WHERE ssn = ?', (ssn,))
+    cursor.execute('SELECT * FROM voters WHERE ssn = ?', (ssn,))
     voter = cursor.fetchone()
-    print(f"Query result for SSN {ssn}: {voter}") #debugging statement 
+    if voter:
+        print(f"Debug: Voter found: {voter}")
+    else:
+        print("Debug: No voter found with that SSN.")
     conn.close()
     return voter
 
-def get_voter(driver_id):
-    """Check if a driver's license is already registered."""
+def get_voter_by_driverid(driver_id):
+    """Check if a voter already exists by driver ID."""
     conn = create_connection()
     cursor = conn.cursor()
-    cursor.execute('SELECT 1 FROM voters WHERE driver_id = ?', (driver_id,))
-    result = cursor.fetchone()
+    cursor.execute('SELECT * FROM voters WHERE driver_id = ?', (driver_id,))
+    voter = cursor.fetchone()
     conn.close()
-    return result is not None
+    return voter
+
 
 # Call this function once to create the database and table of VOTERS
 def create_database():

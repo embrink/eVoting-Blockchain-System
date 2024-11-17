@@ -11,10 +11,11 @@
 # - Version 1.5 (Sprint 4): Revise reroute to /admin_dashboard for auditor user by Ella Brink
 # - Version 1.6 (Sprint 4): Added /cast_vote route by Ella Brink
 # - Version 1.7 (Sprint 4): Added /submit_vote, revised /view_elections_admin, update database imports by Ella Brink
-# - Version 1.8 (Sprint 4): Added flash messages for signup success and failure by Lauren Wilson
-# - Version 1.9 (Sprint 4): Flashed error messages for both duplicate SSN or driver ID by Lauren Wilson
-# - Version 2.0 (Sprint 4): Harcoded auditorid by Lauren Wilson
-# - Version 2.1 (Sprint 4): Fixed voter login by Lauren Wilson
+# - Version 1.8 (Sprint 4): Updated blockchain logic, created contract_address, provider_url and contract_abit for ganache integration by Lucy DiSalvo
+# - Version 1.9 (Sprint 4): Added flash messages for signup success and failure by Lauren Wilson
+# - Version 2.0 (Sprint 4): Flashed error messages for both duplicate SSN or driver ID by Lauren Wilson
+# - Version 2.1 (Sprint 4): Harcoded auditorid by Lauren Wilson
+# - Version 2.2 (Sprint 4): Fixed voter login by Lauren Wilson
 
 
 from flask import Flask, render_template, request, redirect, url_for, session, flash

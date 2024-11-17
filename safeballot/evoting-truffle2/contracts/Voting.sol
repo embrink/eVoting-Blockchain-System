@@ -1,4 +1,15 @@
 // SPDX-License-Identifier: MIT
+/**  
+File: Voting.sol
+Purpose: This contract is designed to manage a basic voting process. It allows for the addition of candidates and casting votes. 
+The contract maintains a list of candidates and ensures each address can vote only once. 
+The contract also counts the votes for each candidate.` table.
+Authors: Ella Brink, Lauren Wilson, Emma Bellai, Lucy DiSalvo 
+Version History:
+- Version 1.0 (Sprint 2): Initial version created by Ella Brink 
+- Version 1.1 (Sprint 4): Updated voting logic by Lucy DiSalvo
+*/
+
 pragma solidity ^0.8.0;
 
 contract Voting {

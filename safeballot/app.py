@@ -20,7 +20,7 @@
 
 
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from database import add_voter, get_voter, create_election, get_current_elections, create_database, create_elections_table, get_all_voters, close_election_in_db
+from database import add_voter, add_vote, get_voter, get_candidates, tally_votes, create_candidates_table, create_election, get_current_elections, create_database, create_elections_table, get_all_voters, create_votes_table, close_election_in_db
 from voter import Voter
 from web3 import Web3
 from datetime import datetime
@@ -303,10 +303,8 @@ def signup():
 #cast vote
 @app.route('/cast/<int:election_id>', methods=['GET', 'POST'])
 def cast(election_id):
-    # Fetch elections from the database (using your get_current_elections function)
     elections = get_current_elections()
 
-    # Find the specific election by ID (you can filter or loop through elections)
     election = next((e for e in elections if e['id'] == election_id), None)
 
     if not election:
@@ -314,81 +312,32 @@ def cast(election_id):
         return redirect(url_for('view_elections_voter'))
 
     if request.method == 'POST':
-        # Handle the vote submission
-        selected_candidate = request.form['candidate']
-        # You can call a function to submit the vote here, like submit_vote_to_db
-        #submit_vote_to_db(election_id, selected_candidate)  # Assuming this function exists
+        selected_candidate_id = request.form['candidate_id']
         voter_id = session.get('voter_id')
+        
         if voter_id:
-            # Get the voter's details from the database (replace this with actual DB query)
-            voter_details = get_voter_by_id(voter_id)  # Implement this function to get the voter details
-            if voter_details:
-                ssn, driver_id, zipcode, voter_account, private_key = voter_details
-                contract_address = "0x1234567890abcdef1234567890abcdef12345678"  # Replace with your actual contract address
-                contract_abi = contract_abi
-
-                # Create an instance of the Voter class
-                voter = Voter(ssn, driver_id, zipcode, voter_account, private_key, contract_address, contract_abi, provider_url)
-                # Cast the vote using the Voter class method
-                voter.cast_vote(selected_candidate)  # This will send the vote to the blockchain
-                
-                flash('Vote submitted successfully!', 'success')
-                return redirect(url_for('view_elections_voter'))
-            else:
-                flash("Voter not found.", "error")
-                return redirect(url_for('login'))
+            add_vote(voter_id, selected_candidate_id, election_id)
+            return render_template('successful_vote.html')
         else:
             flash("Please log in to vote.", "error")
             return redirect(url_for('login'))
 
-        #flash('Vote submitted successfully!', 'success')
-        #return redirect(url_for('view_elections_voter'))
-    # If it's a GET request, render the election and candidates
-    candidates = [election['candidate1'], election['candidate2'], election['candidate3'], election['candidate4']]
-    candidates = [candidate for candidate in candidates if candidate]  # Filter out empty candidates
-
+    # Fetch candidates from the candidates table based on election_id
+    candidates = get_candidates(election_id) 
     return render_template('cast.html', election_title=election['name'], candidates=candidates, election_id=election_id)
 
-def get_candidate_id(selected_candidate):
-    # Mapping candidate names to their respective IDs
-    candidates = {
-        "Alice": 1,
-        "Bob": 2
-    }
-    return candidates.get(selected_candidate, None)
+@app.route('/successful_vote') 
+def successful_vote(): 
+  return render_template('successful_vote.html')
 
-#send vote to blockchain route
-@app.route('/submit_vote/<int:election_id>', methods=['POST'])
-def submit_vote(election_id):
-    selected_candidate = request.form['candidate']
-    
-    # Call the smart contract to cast the vote on the blockchain
-    try:
-        # Assuming you have a web3 instance set up
-        web3 = Web3(Web3.HTTPProvider('http://localhost:7545'))  # Replace with your provider
-        contract = web3.eth.contract(address=contract_address, abi=contract_abi)
-        
-        # Get the candidate ID (this would depend on how the candidates are stored in your contract)
-        candidate_id = get_candidate_id(selected_candidate)  # Implement this mapping
-        
-        # Send the vote to the blockchain
-        transaction = contract.functions.vote(candidate_id).buildTransaction({
-            'from': web3.eth.accounts[0],  # The voter's account
-            'nonce': web3.eth.getTransactionCount(web3.eth.accounts[0]),
-            'gas': 2000000,
-            'gasPrice': Web3.toWei('50', 'gwei')
-        })
-        
-        # Sign the transaction
-        signed_txn = web3.eth.account.signTransaction(transaction, private_key)  # Ensure private key is set
-        
-        # Send the transaction
-        tx_hash = web3.eth.sendRawTransaction(signed_txn.rawTransaction)
-        
-        return f"Vote cast successfully! Transaction hash: {tx_hash.hex()}"
-    
-    except Exception as e:
-        return f"Error while casting vote: {str(e)}"
+@app.route('/statistics/<int:election_id>', methods=['GET'])
+def statistics(election_id):
+  candidates, election = tally_votes(election_id)
+
+    # Calculate time left in the election
+
+  return render_template('statistics.html', candidates=candidates, election=election)
+
 
 # Logout route
 @app.route('/logout', methods=['GET', 'POST'])

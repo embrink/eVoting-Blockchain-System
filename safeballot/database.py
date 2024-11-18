@@ -125,6 +125,93 @@ def create_elections_table():
         conn.commit()
 create_elections_table()
 
+#table with candidates and random ID
+def create_candidates_table():
+    """Create candidates table with a unique ID and name."""
+    with create_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute('''CREATE TABLE IF NOT EXISTS candidates (
+                candidate_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                election_id INTEGER NOT NULL,
+                vote_count INTEGER DEFAULT 0,
+                name TEXT NOT NULL,
+                FOREIGN KEY (election_id) REFERENCES elections (election_id)
+            )
+        ''')
+        conn.commit()
+
+create_candidates_table()
+
+def get_candidates(election_id):
+    """Fetch candidates by election_id from the candidates table."""
+    with create_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute('SELECT candidate_id, name FROM candidates WHERE election_id = ?', (election_id,))
+        candidates = cursor.fetchall()
+    return candidates
+
+
+def create_votes_table():
+    """Create votes table to store voter, candidate, and election IDs along with vote counts."""
+    with create_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS votes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                voter_id INTEGER NOT NULL,
+                candidate_id INTEGER NOT NULL,
+                election_id INTEGER NOT NULL,
+                FOREIGN KEY(voter_id) REFERENCES voters(id),
+                FOREIGN KEY(candidate_id) REFERENCES candidates(id),
+                FOREIGN KEY(election_id) REFERENCES elections(election_id)
+            )
+        ''')
+        conn.commit()
+
+create_votes_table()
+
+def add_vote(voter_id, candidate_id, election_id, vote_count=1):
+    """Add a vote to the votes table and update vote counts in both votes and candidates tables."""
+    with create_connection() as conn:
+        cursor = conn.cursor()
+        
+        # Insert the vote into the votes table
+        cursor.execute('''
+            INSERT INTO votes (voter_id, candidate_id, election_id)
+            VALUES (?, ?, ?)
+        ''', (voter_id, candidate_id, election_id))
+        
+        # Increment the vote count in the votes table (if necessary)
+        cursor.execute('''
+            UPDATE candidates
+            SET vote_count = vote_count + ?
+            WHERE candidate_id = ? AND election_id = ?
+        ''', (vote_count, candidate_id, election_id))
+        
+        conn.commit()
+
+def tally_votes(election_id):
+    """Fetch the total votes for each candidate in a specific election and the election details."""
+    with create_connection() as conn:
+        cursor = conn.cursor()
+
+        # Get election details
+        elections = get_current_elections()
+        election = next((e for e in elections if e['id'] == election_id), None)
+        if not election:
+            return [], None
+
+        # Get candidate names and their vote counts
+        cursor.execute('''
+            SELECT name, vote_count
+            FROM candidates
+            WHERE election_id = ?
+        ''', (election_id,))
+        candidates = cursor.fetchall()
+    return candidates, election
+
+
+        
 # Add an election with candidates as separate arguments
 def create_election(name, date, candidate1, candidate2, candidate3=None, candidate4=None):
     """Insert a new election with up to 4 candidates, setting None for any missing candidates."""
@@ -140,13 +227,20 @@ def create_election(name, date, candidate1, candidate2, candidate3=None, candida
             INSERT INTO elections (name, date, candidate1, candidate2, candidate3, candidate4, status)
             VALUES (?, ?, ?, ?, ?, ?, ?)
         ''', (name, date, candidate1, candidate2, candidate3, candidate4, 'active'))
-        
         # Get the ID of the last inserted row (election_id)
-        election_id = cursor.lastrowid
+        election_id = cursor.lastrowid 
+        # Add candidates to the candidates table
+        candidate_ids = []
+        for candidate in [candidate1, candidate2, candidate3, candidate4]:
+            if candidate:
+                cursor.execute('''
+                    INSERT INTO candidates (name, election_id)
+                    VALUES (?, ?)
+                ''', (candidate, election_id))
+                candidate_ids.append(cursor.lastrowid)
+        conn.commit()
         print(f"Election created with ID: {election_id}")
         return election_id
-     
-import sqlite3
 
 def get_current_elections():
     # Use 'with' to automatically handle closing the connection

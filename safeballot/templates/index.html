@@ -15,25 +15,31 @@ Version History:
     <title>E-Voting System</title>
 </head>
 <body>
-    <div class="header">
-        <a href="/"><img class="logo" src="{{ url_for('static', filename='images/Safeballot (500 x 384 px).png') }}"></a>
-            <div class="dropdown" style="float:right">
-                <a href="#" class="nav">
-                    <div class="one"></div>
-                    <div class="two"></div>
-                    <div class="three"></div>
-                </a>
-            <div class="dropdown-content" style="right: 27px;">
-                <a href="/">Home</a>
-                <a href="/login">Login</a>
-                <a href="/signup">Sign Up</a>
-            </div>
-            </div>
+    <div class="indexbody">
+        <div class="header">
+            <a href="/"><img class="logo" src="{{ url_for('static', filename='images/Safeballot (500 x 384 px).png') }}"></a>
+                <div class="dropdown" style="float:right">
+                    <a href="#" class="nav">
+                        <div class="one"></div>
+                        <div class="two"></div>
+                        <div class="three"></div>
+                    </a>
+                <div class="dropdown-content" style="right: 27px;">
+                    <a href="/">Home</a>
+                    <a href="/login">Login</a>
+                    <a href="/signup">Sign Up</a>
+                </div>
+                </div>
+        </div>
+        
+        <h1 class="title1">WELCOME TO THE E-VOTING SYSTEM:</h1>
+        <div class="container">
+            <img class="safeballot" src="{{ url_for('static', filename='images/Safeballotcolor.png') }}">
+        </div>
+        <div class="options">
+            <a class="button login" href="/login">Login</a>
+            <a class="button signup" href="/signup">Sign Up</a>
+        </div>
     </div>
-    
-    <h1>Welcome to the E-Voting System</h1>
-    <p>Please choose an option:</p>
-    <a href="/login">Login</a> | 
-    <a href="/signup">Sign Up</a>
 </body>
 </html>

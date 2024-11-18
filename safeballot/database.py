@@ -278,6 +278,7 @@ def close_election_in_db(election_id):
 
 
 
+
 def get_all_voters():
     conn = create_connection()
     cursor = conn.cursor()

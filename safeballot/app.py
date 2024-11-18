@@ -221,9 +221,7 @@ def admin_dashboard():
       
         # Fetch current elections
         current_elections = get_current_elections()
-        if not current_elections:
-            flash("Failed to retrieve current elections. Please try again later.", "error")
-            return redirect(url_for('admin_dashboard'))
+      
 
         # Check for duplicate election names
         existing_names = {election['name'].strip().lower() for election in current_elections}
@@ -266,7 +264,7 @@ def view_elections_auditor():
 def close_election(election_id):
     close_election_in_db(election_id)
     flash('Election closed successfully.', 'success')
-    return redirect(url_for('view_elections_auditor'))
+    return redirect(url_for('view_elections'))
 
 # Auditor dashboard route
 @app.route('/auditor_dashboard')

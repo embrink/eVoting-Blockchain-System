@@ -246,8 +246,8 @@ def get_current_elections():
     # Use 'with' to automatically handle closing the connection
     with create_connection() as conn:
         cursor = conn.cursor()
-        # Fetch all columns for each election where status is 'active'
-        cursor.execute("SELECT * FROM elections WHERE status = 'active'")
+        # Fetch all columns for each election where status is 'active' or 'closed'
+        cursor.execute("SELECT * FROM elections")
         rows = cursor.fetchall()
 
         # Convert the rows to a list of dictionaries
@@ -275,6 +275,25 @@ def close_election_in_db(election_id):
     cursor.execute('UPDATE elections SET status = "closed" WHERE election_id = ?', (election_id,))
     conn.commit()
     conn.close()
+
+def get_election_results(election_id):
+    """Fetch the results of an election from the database."""
+    with create_connection() as conn:
+        cursor = conn.cursor()
+        # Assuming votes table has columns: id, election_id, candidate_id, vote_count
+        cursor.execute('''
+            SELECT candidates.name, candidates.id, 
+                   COUNT(votes.candidate_id) as vote_count
+            FROM candidates
+            LEFT JOIN votes ON candidates.id = votes.candidate_id
+            WHERE candidates.election_id = ?
+            GROUP BY candidates.id
+            ORDER BY vote_count DESC
+        ''', (election_id,))
+        results = cursor.fetchall()
+        return results
+
+
 
 
 

@@ -20,7 +20,7 @@
 
 
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from database import add_voter, add_vote, get_voter, get_candidates, tally_votes, create_candidates_table, create_election, get_current_elections, create_database, create_elections_table, get_all_voters, create_votes_table, close_election_in_db
+from database import add_voter, add_vote, get_voter, get_candidates, tally_votes, create_candidates_table, create_election, get_current_elections, create_database, create_elections_table, get_all_voters, create_votes_table, close_election_in_db, get_election_results
 from voter import Voter
 from web3 import Web3
 from datetime import datetime
@@ -265,6 +265,20 @@ def close_election(election_id):
     close_election_in_db(election_id)
     flash('Election closed successfully.', 'success')
     return redirect(url_for('view_elections'))
+
+@app.route('/view_results/<int:election_id>')
+def view_results(election_id):
+    candidates, election = tally_votes(election_id)
+    if not candidates:
+        return "No votes found for this election.", 404
+
+    results = sorted(candidates, key=lambda x: x[1], reverse=True)  # Sort candidates by vote count
+
+    max_votes = results[0][1] if results else 0
+    winners = [candidate for candidate in results if candidate[1] == max_votes]
+
+    return render_template('view_results.html', results=results, winners=winners, election=election)
+
 
 # Auditor dashboard route
 @app.route('/auditor_dashboard')

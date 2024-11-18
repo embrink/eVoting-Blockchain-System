@@ -8,97 +8,88 @@ Version History:
 -->
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Current Elections</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    </head>
-    <body>
-        <div class="header">
-            <a href="/"><img class="logo" src="{{ url_for('static', filename='images/Safeballot (500 x 384 px).png') }}"></a>
-                <div class="dropdown" style="float:right">
-                    <a href="#" class="nav">
-                        <div class="one"></div>
-                        <div class="two"></div>
-                        <div class="three"></div>
-                    </a>
-                <div class="dropdown-content" style="right: 27px;">
-                    <a href="/">Home</a>
-                    <a href="/login">Login</a>
-                    <a href="/signup">Sign Up</a>
-                </div>
-                </div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Current Elections</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="header">
+        <a href="/"><img class="logo" src="{{ url_for('static', filename='images/Safeballot (500 x 384 px).png') }}"></a>
+        <div class="dropdown" style="float:right">
+            <a href="#" class="nav">
+                <div class="one"></div>
+                <div class="two"></div>
+                <div class="three"></div>
+            </a>
+            <div class="dropdown-content" style="right: 27px;">
+                <a href="/">Home</a>
+                <a href="/login">Login</a>
+                <a href="/signup">Sign Up</a>
+            </div>
         </div>
-        <h1>Current Elections</h1>
-    
-        <table>
-            <thead>
-                <tr>
-                    <th>Election Name</th>
-                    <th>Date</th>
-                    <th>Candidate 1</th>
-                    <th>Candidate 2</th>
-                    <th>Candidate 3</th>
-                    <th>Candidate 4</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for election in elections %}
-                <tr>
-                    <td>{{ election.name }}</td>
-                    <td>{{ election.date }}</td>
-                    
-                    <!-- Candidate 1 -->
-                    <td>
-                        {% if election.candidate1 %}
-                            {{ election.candidate1 }}
-                        {% else %}
-                            
-                        {% endif %}
-                    </td>
-    
-                    <!-- Candidate 2 -->
-                    <td>
-                        {% if election.candidate2 %}
-                            {{ election.candidate2 }}
-                        {% else %}
-                            
-                        {% endif %}
-                    </td>
-    
-                    <!-- Candidate 3 -->
-                    <td>
-                        {% if election.candidate3 %}
-                            {{ election.candidate3 }}
-                        {% else %}
-                            
-                        {% endif %}
-                    </td>
-    
-                    <!-- Candidate 4 -->
-                    <td>
-                        {% if election.candidate4 %}
-                            {{ election.candidate4 }}
-                        {% else %}
-                            
-                        {% endif %}
-                    </td>
-    
-                    <td>{{ election.status }}</td>
-                    <td>{{ election.created_at }}</td>
-                    <td>
-                        <!-- Vote button: Navigate to the cast vote page for the selected election -->
-                        <p><a href="{{ url_for('cast', election_id=election.id) }}">Vote</a></p>
+    </div>
+    <h1>Current Elections</h1>
 
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    
-        <p><a href="{{ url_for('voter_dashboard') }}">Back to Voter Dashboard</a></p>
-    </body>
+    <table>
+        <thead>
+            <tr>
+                <th>Election Name</th>
+                <th>Date</th>
+                <th>Candidate 1</th>
+                <th>Candidate 2</th>
+                <th>Candidate 3</th>
+                <th>Candidate 4</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for election in elections %}
+            <tr>
+                <td>{{ election.name }}</td>
+                <td>{{ election.date }}</td>
+                <!-- Candidate 1 -->
+                <td>
+                    {% if election.candidate1 %}
+                        {{ election.candidate1 }}
+                    {% endif %}
+                </td>
+                <!-- Candidate 2 -->
+                <td>
+                    {% if election.candidate2 %}
+                        {{ election.candidate2 }}
+                    {% endif %}
+                </td>
+                <!-- Candidate 3 -->
+                <td>
+                    {% if election.candidate3 %}
+                        {{ election.candidate3 }}
+                    {% endif %}
+                </td>
+                <!-- Candidate 4 -->
+                <td>
+                    {% if election.candidate4 %}
+                        {{ election.candidate4 }}
+                    {% endif %}
+                </td>
+                <td>{{ election.status }}</td>
+                <td>{{ election.created_at }}</td>
+                <td>
+                    {% if election.status == 'active' %}
+                    <!-- Vote button: Navigate to the cast vote page for the selected election -->
+                    <p><a href="{{ url_for('cast', election_id=election.id) }}" class="button">Vote</a></p>
+                    {% elif election.status == 'closed' %}
+                    <!-- View Results button for closed elections -->
+                    <p><a href="{{ url_for('view_results', election_id=election.id) }}" class="button">View Results</a></p>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <p><a href="{{ url_for('voter_dashboard') }}">Back to Voter Dashboard</a></p>
+</body>
 </html>

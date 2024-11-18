@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Election Results</title>
+</head>
+<body>
+    <h1>Election Results for {{ election.name }}</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Candidate</th>
+                <th>Vote Count</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in results %}
+            <tr>
+                <td>{{ result[0] }}</td> <!-- Candidate Name -->
+                <td>{{ result[1] }}</td> <!-- Vote Count -->
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if results %}
+        {% if results[0][1] == 0 %}
+            <p>No votes have been cast yet.</p>
+        {% elif winners|length > 1 %}
+            <h2>It's a draw between:
+                {% for winner in winners %}
+                    {{ winner[0] }}{% if not loop.last %}, {% endif %}
+                {% endfor %}
+                with {{ results[0][1] }} votes each.
+            </h2>
+        {% else %}
+            <h2>Winner: {{ winners[0][0] }} with {{ results[0][1] }} votes</h2>
+        {% endif %}
+    {% else %}
+        <p>No results available.</p>
+    {% endif %}
+
+    <p><a href="{{ url_for('view_elections') }}">Back to Elections</a></p>
+</body>
+</html>

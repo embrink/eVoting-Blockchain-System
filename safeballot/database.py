@@ -173,6 +173,16 @@ def get_current_elections():
     # Return the elections list after closing the connection (handled by 'with')
     return elections
 
+def close_election_in_db(election_id):
+    """Mark an election as closed in the database."""
+    conn = create_connection()
+    cursor = conn.cursor()
+    cursor.execute('UPDATE elections SET status = "closed" WHERE election_id = ?', (election_id,))
+    conn.commit()
+    conn.close()
+
+
+
 def get_all_voters():
     conn = create_connection()
     cursor = conn.cursor()

@@ -16,10 +16,11 @@
 # - Version 2.0 (Sprint 4): Flashed error messages for both duplicate SSN or driver ID by Lauren Wilson
 # - Version 2.1 (Sprint 4): Harcoded auditorid by Lauren Wilson
 # - Version 2.2 (Sprint 4): Fixed voter login by Lauren Wilson
+# - Version 2.3 (Sprint 4): Added close election function by Lauren Wilson
 
 
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from database import add_voter, get_voter, create_election, get_current_elections, create_database, create_elections_table, get_all_voters
+from database import add_voter, get_voter, create_election, get_current_elections, create_database, create_elections_table, get_all_voters, close_election_in_db
 from voter import Voter
 from web3 import Web3
 from datetime import datetime
@@ -188,8 +189,6 @@ def login():
     return render_template('login.html')
 
 
-    return render_template('login.html')  # Render the login page template
-
 # Admin dashboard route
 @app.route('/admin_dashboard', methods=['GET', 'POST'])
 def admin_dashboard():
@@ -253,7 +252,7 @@ def view_elections():
         return render_template('view_elections.html', elections=elections)
     else:
         flash("You need to log in as admin first.", "error")
-        return redirect(url_for('login.html'))
+        return redirect(url_for('login'))
     
 
 #Auditor view of elections
@@ -261,6 +260,13 @@ def view_elections():
 def view_elections_auditor():
     elections = get_current_elections()  # Fetch current elections from the database
     return render_template('view_electionsAu.html', elections=elections)  # Render the view elections page
+
+
+@app.route('/close_election/<int:election_id>', methods=['POST'])
+def close_election(election_id):
+    close_election_in_db(election_id)
+    flash('Election closed successfully.', 'success')
+    return redirect(url_for('view_elections_auditor'))
 
 # Auditor dashboard route
 @app.route('/auditor_dashboard')

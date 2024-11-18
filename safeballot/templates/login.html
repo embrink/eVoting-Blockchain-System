@@ -17,6 +17,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <title>Login</title>
     <script>
         function showFields(role) {
@@ -69,6 +70,21 @@
 </head>
 
 <body>
+    <div class="header">
+        <a href="index.html"><img class="logo" src="{{ url_for('static', filename='images/Safeballot (500 x 384 px).png') }}"></a>
+            <div class="dropdown" style="float:right">
+                <a href="#" class="nav">
+                    <div class="one"></div>
+                    <div class="two"></div>
+                    <div class="three"></div>
+                </a>
+            <div class="dropdown-content" style="right: 27px;">
+                <a href="/index">Home</a>
+                <a href="/login">Login</a>
+                <a href="/signup">Sign Up</a>
+            </div>
+            </div>
+    </div>
     <h1>Login</h1>
 
     <form method="POST" action="{{ url_for('login') }}">

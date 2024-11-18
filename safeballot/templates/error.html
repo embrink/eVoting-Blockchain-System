@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Error</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}"> <!-- Optional CSS file -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -29,6 +29,21 @@
     </style>
 </head>
 <body>
+    <div class="header">
+        <a href="index.html"><img class="logo" src="{{ url_for('static', filename='images/Safeballot (500 x 384 px).png') }}"></a>
+            <div class="dropdown" style="float:right">
+                <a href="#" class="nav">
+                    <div class="one"></div>
+                    <div class="two"></div>
+                    <div class="three"></div>
+                </a>
+            <div class="dropdown-content" style="right: 27px;">
+                <a href="/index">Home</a>
+                <a href="/login">Login</a>
+                <a href="/signup">Sign Up</a>
+            </div>
+            </div>
+    </div>
     <h1>Error Occurred</h1>
     <p>We're sorry, but something went wrong.</p>
     <p>Please try again later or contact support if the problem persists.</p>

@@ -13,6 +13,7 @@
 # - Version 1.6.1 (Sprint 4): Modified create_election_table, create_election, create_candidate_table, added add_candidate function by Ella Brink
 # - Version 1.7 (Sprint 4): Modified database to hold candidates and correctly populate by Ella Brink
 # - Version 1.8 (Sprint 4): Made driver's license ID requirement unique, eliminated duplicated IDs by Lauren Wilson
+# - Version 1.9 (Sprint 4): Added Close Election Function by Lauren Wilson
 
 
 

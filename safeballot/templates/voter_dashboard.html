@@ -15,9 +15,68 @@ Version History:
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+
+    <style>
+        /* Popup message styling */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            z-index: 1000;
+        }
+        .popup.active {
+            display: block;
+        }
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        .overlay.active {
+            display: block;
+        }
+        .close-btn {
+            margin-top: 10px;
+            padding: 5px 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+    
     <title>Voter Dashboard</title>
 </head>
 <body>
+
+    <!-- Display flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="overlay active"></div>
+        <div class="popup active">
+            {% for category, message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+            <form method="GET" action="/login">
+                <button type="submit" class="close-btn">OK</button>
+            </form>
+        </div>
+    {% endif %}
+    {% endwith %}
+
     <div class="header">
         <a href="/"><img class="logo" src="{{ url_for('static', filename='images/Safeballot (500 x 384 px).png') }}"></a>
             <div class="dropdown" style="float:right">

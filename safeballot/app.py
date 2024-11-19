@@ -20,7 +20,7 @@
 
 
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from database import add_voter, add_vote, get_voter, get_candidates, tally_votes, create_candidates_table, create_election, get_current_elections, create_database, create_elections_table, get_all_voters, create_votes_table, close_election_in_db, get_election_results
+from database import add_voter, add_vote, get_voter, get_candidates, tally_votes, create_candidates_table, create_election, get_current_elections, create_database, create_elections_table, get_all_voters, create_votes_table, close_election_in_db, get_election_results, approve_election
 from voter import Voter
 from web3 import Web3
 from datetime import datetime
@@ -180,7 +180,6 @@ def login():
             
             if voter_info[2] == ssn and voter_info[3] == zipcode and voter_info[4] == driver_id:
                 session['voter_id'] = voter_info[0]
-                flash('Signup successful! You can now log in.', 'success')
                 return redirect(url_for('voter_dashboard'))
             else:
                 flash("Invalid voter credentials. Please try again.", "error")
@@ -266,11 +265,16 @@ def close_election(election_id):
     flash('Election closed successfully.', 'success')
     return redirect(url_for('view_elections'))
 
+# View Results route
 @app.route('/view_results/<int:election_id>')
 def view_results(election_id):
     candidates, election = tally_votes(election_id)
-    if not candidates:
+    if not election:
         return "No votes found for this election.", 404
+
+    if election['status'] != 'approved':
+        flash('Election is unapproved, check back for results later.', 'error')
+        return redirect(url_for('view_elections_voter'))
 
     results = sorted(candidates, key=lambda x: x[1], reverse=True)  # Sort candidates by vote count
 
@@ -338,6 +342,15 @@ def cast(election_id):
     candidates = get_candidates(election_id) 
     return render_template('cast.html', election_title=election['name'], candidates=candidates, election_id=election_id)
 
+# Approve Election route 
+@app.route('/approve_election/<int:election_id>')
+def approve_election_route(election_id): 
+  print(f"Approving election with ID: {election_id}") # Debug statement
+  approve_election(election_id) 
+  flash('You have approved the election.', 'success') 
+  return redirect(url_for('view_elections_auditor'))
+
+
 @app.route('/successful_vote') 
 def successful_vote(): 
   return render_template('successful_vote.html')
@@ -363,4 +376,5 @@ if __name__ == '__main__':
 
 for rule in app.url_map.iter_rules():
     print(rule) 
+
 

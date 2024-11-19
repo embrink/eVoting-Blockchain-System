@@ -293,9 +293,12 @@ def get_election_results(election_id):
         results = cursor.fetchall()
         return results
 
-
-
-
+def approve_election(election_id):
+    """Mark an election as approved in the database."""
+    with create_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute('UPDATE elections SET status = "approved" WHERE election_id = ?', (election_id,))
+        conn.commit()
 
 
 def get_all_voters():
